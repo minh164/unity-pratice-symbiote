@@ -10,6 +10,11 @@ public class Creation : MonoBehaviour
     public float x;
     public float y;
     public float z;
+    [SerializeField]
+    private bool spherize = false;
+    [SerializeField]
+    private float colliderSize = 0.1f;
+    
 
     private SkinnedMeshRenderer rend;
     private Mesh mesh;
@@ -49,6 +54,10 @@ public class Creation : MonoBehaviour
         GenerateLeft();
         GenerateTop();
         GenerateBot();
+
+        if (spherize) {
+            mesh.vertices = SpherizeVectors(mesh.vertices);
+        }
 
         mesh.RecalculateNormals();
 
@@ -113,8 +122,6 @@ public class Creation : MonoBehaviour
         CreateJoint(botTlBone, centerBone);
         CreateJoint(botBrBone, centerBone);
         CreateJoint(botTrBone, centerBone);
-
-        mesh.vertices = SpherizeVectors(mesh.vertices);
 
         // Add Bones and Mesh into Renderer.
         rend.sharedMesh = mesh;
@@ -262,8 +269,6 @@ public class Creation : MonoBehaviour
         Matrix4x4[] bindposes = new Matrix4x4[1];
 
         GameObject bone = new GameObject(name);
-        bone.AddComponent<Rigidbody>();
-        bone.AddComponent<BoxCollider>();
         bones[0] = bone.transform;
         bones[0].parent = transform;
         // Set the position relative to the parent
@@ -276,6 +281,15 @@ public class Creation : MonoBehaviour
         rend.bones = rend.bones.Concat(bones).ToArray();
         bonesNameToIndex[name] = rend.bones.Length - 1;
 
+        // Add rigid for bone.
+        bone.AddComponent<Rigidbody>();
+        bone.AddComponent<BoxCollider>();
+        BoxCollider collider = bone.GetComponent<BoxCollider>();
+        collider.size = new Vector3(colliderSize, colliderSize, colliderSize);
+
+        // Add movements for each bone.
+        bone.AddComponent<Movement>();
+        
         return bone;
     }
 
