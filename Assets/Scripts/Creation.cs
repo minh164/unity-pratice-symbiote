@@ -39,9 +39,6 @@ public class Creation : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Vector3.Distance(gameObject.transform.position, center.transform.position) > 1) {
-            // gameObject.transform.position = center.transform.position;
-        }
     }
 
     private void CreateCube()
@@ -66,7 +63,6 @@ public class Creation : MonoBehaviour
 
         // Add Center bone.
         GameObject centerBone = CreateBone("Center", Vector3.zero);
-        center = centerBone;
 
         // Add Bone Weights.
         CreateBoneWeights();
