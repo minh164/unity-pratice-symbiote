@@ -13,7 +13,7 @@ public class Creation : MonoBehaviour
     [SerializeField]
     private bool spherize = false;
     [SerializeField]
-    private float colliderSize = 0.1f;
+    private float colliderSize = 0.2f;
     
 
     private SkinnedMeshRenderer rend;
@@ -27,6 +27,7 @@ public class Creation : MonoBehaviour
     private Dictionary<string, int> topWeights;
     private Dictionary<string, int> botWeights;
     private Dictionary<string, int> bonesNameToIndex;
+    private GameObject center;
 
     // Start is called before the first frame update
     void Start()
@@ -38,7 +39,9 @@ public class Creation : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (Vector3.Distance(gameObject.transform.position, center.transform.position) > 1) {
+            // gameObject.transform.position = center.transform.position;
+        }
     }
 
     private void CreateCube()
@@ -63,6 +66,7 @@ public class Creation : MonoBehaviour
 
         // Add Center bone.
         GameObject centerBone = CreateBone("Center", Vector3.zero);
+        center = centerBone;
 
         // Add Bone Weights.
         CreateBoneWeights();
@@ -122,6 +126,9 @@ public class Creation : MonoBehaviour
         CreateJoint(botTlBone, centerBone);
         CreateJoint(botBrBone, centerBone);
         CreateJoint(botTrBone, centerBone);
+
+        // Connect center to parent.
+        CreateJoint(centerBone, gameObject);
 
         // Add Bones and Mesh into Renderer.
         rend.sharedMesh = mesh;
@@ -444,7 +451,7 @@ public class Creation : MonoBehaviour
         SpringJoint joint = bone.GetComponent<SpringJoint>();
         joint.connectedBody = connectedBone.GetComponent<Rigidbody>();
         joint.autoConfigureConnectedAnchor = true;
-        joint.spring = 20;
+        joint.spring = 10;
     }
 
     private Vector3[] SpherizeVectors(Vector3[] vectors)
