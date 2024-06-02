@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Creation : MonoBehaviour
@@ -20,19 +21,12 @@ public class Creation : MonoBehaviour
     private Mesh mesh;
     private int horizontalVertexNumber = 2; // From negative number to postive number of vertex range on horizontal.
     private int vertivcalVertexNumber = 2; // From negative number to postive number of vertex range on vertical.
-    private Dictionary<string, int> frontWeights;
-    private Dictionary<string, int> backWeights;
-    private Dictionary<string, int> rightWeights;
-    private Dictionary<string, int> leftWeights;
-    private Dictionary<string, int> topWeights;
-    private Dictionary<string, int> botWeights;
-    private Dictionary<string, int> bonesNameToIndex;
-    private GameObject center;
+
+    private GameObject[] bones = new GameObject[]{};
 
     // Start is called before the first frame update
     void Start()
     {
-        bonesNameToIndex = new Dictionary<string, int>();
         CreateCube();
     }
 
@@ -48,6 +42,9 @@ public class Creation : MonoBehaviour
 
         mesh = new Mesh();
 
+        // Add Center bone.
+        GameObject centerBone = GenerateCell(Vector3.zero, "0");
+
         GenerateFront();
         GenerateBack();
         GenerateRight();
@@ -55,176 +52,133 @@ public class Creation : MonoBehaviour
         GenerateTop();
         GenerateBot();
 
-        if (spherize) {
-            mesh.vertices = SpherizeVectors(mesh.vertices);
-        }
-
         mesh.RecalculateNormals();
-
-        // Add Center bone.
-        GameObject centerBone = CreateBone("Center", Vector3.zero);
-
-        // Add Bone Weights.
-        CreateBoneWeights();
-
-        // Add Top bones.
-        GameObject topBlBone = CreateBone("Top-BotLeft", mesh.vertices[topWeights["bot_left"]]);
-        GameObject topTlBone = CreateBone("Top-TopLeft", mesh.vertices[topWeights["top_left"]]);
-        GameObject topTrBone = CreateBone("Top-TopRight", mesh.vertices[topWeights["top_right"]]);
-        GameObject topBrBone = CreateBone("Top-BotRight", mesh.vertices[topWeights["bot_right"]]);
-        
-        // Add Bot bones.
-        GameObject botBlBone = CreateBone("Bot-BotLeft", mesh.vertices[botWeights["bot_left"]]);
-        GameObject botTlBone = CreateBone("Bot-TopLeft", mesh.vertices[botWeights["top_left"]]);
-        GameObject botTrBone = CreateBone("Bot-TopRight", mesh.vertices[botWeights["top_right"]]);
-        GameObject botBrBone = CreateBone("Bot-BotRight", mesh.vertices[botWeights["bot_right"]]);
-
-        // Set bones to weights.
-        SetBoneToSquadCorner("Top-BotLeft", topWeights, "BotLeft");
-        SetBoneToSquadCorner("Top-BotLeft", leftWeights, "TopLeft");
-        SetBoneToSquadCorner("Top-BotLeft", frontWeights, "TopLeft");
-
-        SetBoneToSquadCorner("Top-TopLeft", topWeights, "TopLeft");
-        SetBoneToSquadCorner("Top-TopLeft", backWeights, "TopLeft");
-        SetBoneToSquadCorner("Top-TopLeft", leftWeights, "TopRight");
-
-        SetBoneToSquadCorner("Top-BotRight", topWeights, "BotRight");
-        SetBoneToSquadCorner("Top-BotRight", rightWeights, "TopLeft");
-        SetBoneToSquadCorner("Top-BotRight", frontWeights, "TopRight");
-        
-        SetBoneToSquadCorner("Top-TopRight", topWeights, "TopRight");
-        SetBoneToSquadCorner("Top-TopRight", rightWeights, "TopRight");
-        SetBoneToSquadCorner("Top-TopRight", backWeights, "TopRight");
-
-        SetBoneToSquadCorner("Bot-BotLeft", frontWeights, "BotLeft");
-        SetBoneToSquadCorner("Bot-BotLeft", leftWeights, "BotLeft");
-        SetBoneToSquadCorner("Bot-BotLeft", botWeights, "BotLeft");
-
-        SetBoneToSquadCorner("Bot-TopLeft", botWeights, "TopLeft");
-        SetBoneToSquadCorner("Bot-TopLeft", backWeights, "BotLeft");
-        SetBoneToSquadCorner("Bot-TopLeft", leftWeights, "BotRight");
-
-        SetBoneToSquadCorner("Bot-BotRight", frontWeights, "BotRight");
-        SetBoneToSquadCorner("Bot-BotRight", botWeights, "BotRight");
-        SetBoneToSquadCorner("Bot-BotRight", rightWeights, "BotLeft");
-
-        SetBoneToSquadCorner("Bot-TopRight", rightWeights, "BotRight");
-        SetBoneToSquadCorner("Bot-TopRight", backWeights, "BotRight");
-        SetBoneToSquadCorner("Bot-TopRight", botWeights, "TopRight");
-
-        // Add joints.
-        CreateJoint(topBlBone, centerBone);
-        CreateJoint(topTlBone, centerBone);
-        CreateJoint(topBrBone, centerBone);
-        CreateJoint(topTrBone, centerBone);
-        
-        CreateJoint(botBlBone, centerBone);
-        CreateJoint(botTlBone, centerBone);
-        CreateJoint(botBrBone, centerBone);
-        CreateJoint(botTrBone, centerBone);
 
         // Connect center to parent.
         CreateJoint(centerBone, gameObject);
+
+        // Connect bones to center bone.
+        for (int i = 1; i < bones.Length; i++) {
+            CreateJoint(bones[i], centerBone);
+        }
 
         // Add Bones and Mesh into Renderer.
         rend.sharedMesh = mesh;
         rend.material = mat;
     }
 
-    /// <summary>
-    /// Set a bone to corner weights of a squad.
-    /// </summary>
-    /// <param name="boneName"></param>
-    /// <param name="squadWeights"></param>
-    /// <param name="corner"></param>
-    private void SetBoneToSquadCorner(string boneName, Dictionary<string, int> squadWeights, string corner)
+    private void GenerateFront()
     {
-        int spacePerCorner = (vertivcalVertexNumber * 2 + 1) * horizontalVertexNumber;
-        switch (corner) {
-            case "BotLeft":
-                SetBoneToCorner(boneName, squadWeights["bot_left"]);
-                break;
-            case "TopLeft":
-                SetBoneToCorner(boneName, squadWeights["top_left"] - vertivcalVertexNumber);
-                break;
-            case "BotRight":
-                SetBoneToCorner(boneName, squadWeights["bot_right"] - spacePerCorner);
-                break;
-            case "TopRight":
-                SetBoneToCorner(boneName, squadWeights["top_right"] - spacePerCorner - vertivcalVertexNumber);
-                break;
-        }
+        float forwardPos = (z / 2) * -1;
+        CreateSquadVertices(x, y, forwardPos, "front");
+        CreateSquadTriangles();
     }
 
-    /// <summary>
-    /// Set a bone to corner weights.
-    /// </summary>
-    /// <param name="boneName"></param>
-    /// <param name="fromWeight"></param>
-    private void SetBoneToCorner(string boneName, int fromWeight)
+    private void GenerateBack()
     {
-        for (int i=fromWeight; i<=vertivcalVertexNumber+fromWeight; i++) {
-            int colUnit = vertivcalVertexNumber * 2 + 1;
-            for (int j=i; j<=(colUnit*horizontalVertexNumber+i); j+=colUnit) {
-                SetBoneToWeight(boneName, j);
-            }
+        CreateSquadVertices(x, y, z/2, "back");
+        CreateSquadTriangles(true);
+    }
+
+    private void GenerateRight()
+    {
+        CreateSquadVertices(z, y, x/2, "right");
+        CreateSquadTriangles();
+    }
+
+    private void GenerateLeft()
+    {
+        float forwardPos = (x / 2) * -1;
+        CreateSquadVertices(z, y, forwardPos, "left");
+        CreateSquadTriangles(true);
+    }
+
+    private void GenerateTop()
+    {
+        CreateSquadVertices(x, z, y/2, "top");
+        CreateSquadTriangles();
+    }
+
+    private void GenerateBot()
+    {
+        float forwardPos = (y / 2) * -1;
+        CreateSquadVertices(x, z, forwardPos, "bot");
+        CreateSquadTriangles(true);
+    }
+
+    private GameObject GenerateCell(Vector3 position, string name)
+    {
+        Vector3 vertex = CreateVertex(position);
+
+        // Add first bone weight, others are auto-added when create new vertex.
+        if (mesh.boneWeights.Length <= 0) {
+            mesh.boneWeights = new BoneWeight[] {
+                new BoneWeight{weight0 = 1, boneIndex0 = 0}    
+            };
         }
+
+        CreateBone(name, vertex);
+        SetBoneToWeight(bones.Length - 1, mesh.boneWeights.Length - 1);
+
+        return bones[bones.Length - 1];
     }
 
     /// <summary>
     /// Set a bone to a weight.
     /// </summary>
-    /// <param name="boneName"></param>
+    /// <param name="boneIndex"></param>
     /// <param name="weightIndex"></param>
     /// <param name="boneNumber"></param>
-    private void SetBoneToWeight(string boneName, int weightIndex, int boneNumber = 0)
+    private void SetBoneToWeight(int boneIndex, int weightIndex, int boneNumber = 0)
     {
-        BoneWeight[] weights = mesh.boneWeights;
+        // Must clone bone weights from mesh to update a specified weight element by index.
+        BoneWeight[] cloneWeights = mesh.boneWeights;
+        BoneWeight weight = cloneWeights[weightIndex];
 
         // Auto set bone to empty bone number.
         if (boneNumber == 0) {
-            if (weights[weightIndex].boneIndex0 < 0) {
+            if (weight.boneIndex0 < 0) {
                 // Center bone has value is 0.
                 boneNumber = 1;
             }
-            else if (weights[weightIndex].boneIndex1 <= 0) {
+            else if (weight.boneIndex1 <= 0) {
                 boneNumber = 2;
             }
-            else if (weights[weightIndex].boneIndex2 <= 0) {
+            else if (weight.boneIndex2 <= 0) {
                 boneNumber = 3;
             }
-            else if (weights[weightIndex].boneIndex3 <= 0) {
+            else if (weight.boneIndex3 <= 0) {
                 boneNumber = 4;
             }
         }
 
         switch (boneNumber) {
             case 1:
-                weights[weightIndex].boneIndex0 = bonesNameToIndex[boneName];
+                weight.boneIndex0 = boneIndex;
                 break;
             case 2:
-                weights[weightIndex].boneIndex1 = bonesNameToIndex[boneName];
+                weight.boneIndex1 = boneIndex;
                 break;
             case 3:
-                weights[weightIndex].boneIndex2 = bonesNameToIndex[boneName];
+                weight.boneIndex2 = boneIndex;
                 break;
             case 4:
-                weights[weightIndex].boneIndex3 = bonesNameToIndex[boneName];
+                weight.boneIndex3 = boneIndex;
                 break;
         }
 
         float boneSum = 0;
-        if (weights[weightIndex].boneIndex0 >= 0) {
+        if (weight.boneIndex0 >= 0) {
             // Center bone has value is 0.
             boneSum++;
         }
-        if (weights[weightIndex].boneIndex1 > 0) {
+        if (weight.boneIndex1 > 0) {
             boneSum++;
         }
-        if (weights[weightIndex].boneIndex2 > 0) {
+        if (weight.boneIndex2 > 0) {
             boneSum++;
         }
-        if (weights[weightIndex].boneIndex3 > 0) {
+        if (weight.boneIndex3 > 0) {
             boneSum++;
         }
 
@@ -233,118 +187,75 @@ public class Creation : MonoBehaviour
 
         switch (boneSum) {
             case 1:
-                weights[weightIndex].weight0 = weightValue;
+                weight.weight0 = weightValue;
                 break;
             case 2:
-                weights[weightIndex].weight0 = weightValue;
-                weights[weightIndex].weight1 = weightValue;
+                weight.weight0 = weightValue;
+                weight.weight1 = weightValue;
                 break;
             case 3:
-                weights[weightIndex].weight0 = weightValue;
-                weights[weightIndex].weight1 = weightValue;
-                weights[weightIndex].weight2 = weightValue;
+                weight.weight0 = weightValue;
+                weight.weight1 = weightValue;
+                weight.weight2 = weightValue;
                 break;
             case 4:
-                weights[weightIndex].weight0 = weightValue;
-                weights[weightIndex].weight1 = weightValue;
-                weights[weightIndex].weight2 = weightValue;
-                weights[weightIndex].weight3 = weightValue;
+                weight.weight0 = weightValue;
+                weight.weight1 = weightValue;
+                weight.weight2 = weightValue;
+                weight.weight3 = weightValue;
                 break;
         }
 
-        mesh.boneWeights = weights;
+        cloneWeights[weightIndex] = weight;
+        mesh.boneWeights = cloneWeights;
     }
 
-    private void CreateBoneWeights()
+    private Vector3 CreateVertex(Vector3 position)
     {
-        BoneWeight[] weights = new BoneWeight[mesh.vertexCount];
-
-        for (int i=0; i<weights.Length; i++) {
-            weights[i].weight0 = 1;
-            weights[i].boneIndex0 = bonesNameToIndex["Center"];
+        if (spherize) {
+            position = position.normalized;
         }
-        mesh.boneWeights = weights;
+
+        Vector3[] vertices = new Vector3[] {
+            position
+        };
+        mesh.vertices = mesh.vertices.Concat(vertices).ToArray();
+
+        return position;
     }
 
     private GameObject CreateBone(string name, Vector3 position)
     {
-        Transform[] bones = new Transform[1];
+        Transform[] tranBones = new Transform[1];
         Matrix4x4[] bindposes = new Matrix4x4[1];
 
         GameObject bone = new GameObject(name);
-        bones[0] = bone.transform;
-        bones[0].parent = transform;
+        tranBones[0] = bone.transform;
+        tranBones[0].parent = transform;
         // Set the position relative to the parent
-        bones[0].localRotation = Quaternion.identity;
-        bones[0].localPosition = position;
+        tranBones[0].localRotation = Quaternion.identity;
+        tranBones[0].localPosition = position;
         
-        bindposes[0] = bones[0].worldToLocalMatrix * transform.localToWorldMatrix;
+        bindposes[0] = tranBones[0].worldToLocalMatrix * transform.localToWorldMatrix;
 
         mesh.bindposes = mesh.bindposes.Concat(bindposes).ToArray();
-        rend.bones = rend.bones.Concat(bones).ToArray();
-        bonesNameToIndex[name] = rend.bones.Length - 1;
+        rend.bones = rend.bones.Concat(tranBones).ToArray();
 
         // Add rigid for bone.
         bone.AddComponent<Rigidbody>();
-        bone.AddComponent<BoxCollider>();
-        BoxCollider collider = bone.GetComponent<BoxCollider>();
-        collider.size = new Vector3(colliderSize, colliderSize, colliderSize);
+        bone.AddComponent<SphereCollider>();
+        SphereCollider collider = bone.GetComponent<SphereCollider>();
+        collider.radius = colliderSize;
 
         // Add movements for each bone.
         bone.AddComponent<Movement>();
+
+        GameObject[] boneList = new GameObject[] {
+            bone
+        };
+        bones = bones.Concat(boneList).ToArray();
         
         return bone;
-    }
-
-    private void GenerateFront()
-    {
-        int fromIndex = mesh.vertexCount;
-        float forwardPos = (z / 2) * -1;
-        CreateSquadVertices(x, y, forwardPos, "front");
-        CreateSquadTriangles();
-        frontWeights = GetSquadCornerIndexes(fromIndex, mesh.vertexCount-1);
-    }
-
-    private void GenerateBack()
-    {
-        int fromIndex = mesh.vertexCount;
-        CreateSquadVertices(x, y, z/2, "back");
-        CreateSquadTriangles(true);
-        backWeights = GetSquadCornerIndexes(fromIndex, mesh.vertexCount-1);
-    }
-
-    private void GenerateRight()
-    {
-        int fromIndex = mesh.vertexCount;
-        CreateSquadVertices(z, y, x/2, "right");
-        CreateSquadTriangles();
-        rightWeights = GetSquadCornerIndexes(fromIndex, mesh.vertexCount-1);
-    }
-
-    private void GenerateLeft()
-    {
-        int fromIndex = mesh.vertexCount;
-        float forwardPos = (x / 2) * -1;
-        CreateSquadVertices(z, y, forwardPos, "left");
-        CreateSquadTriangles(true);
-        leftWeights = GetSquadCornerIndexes(fromIndex, mesh.vertexCount-1);
-    }
-
-    private void GenerateTop()
-    {
-        int fromIndex = mesh.vertexCount;
-        CreateSquadVertices(x, z, y/2, "top");
-        CreateSquadTriangles();
-        topWeights = GetSquadCornerIndexes(fromIndex, mesh.vertexCount-1);
-    }
-
-    private void GenerateBot()
-    {
-        int fromIndex = mesh.vertexCount;
-        float forwardPos = (y / 2) * -1;
-        CreateSquadVertices(x, z, forwardPos, "bot");
-        CreateSquadTriangles(true);
-        botWeights = GetSquadCornerIndexes(fromIndex, mesh.vertexCount-1);
     }
 
     private void CreateSquadVertices(float width, float height, float forwardPos, string side)
@@ -358,39 +269,41 @@ public class Creation : MonoBehaviour
         int rowStart = vertivcalVertexNumber * -1;
 
         // Generate vertices.
-        Vector3[] vertices = new Vector3[cols * rows];
+        int vertexTotal = cols * rows;
+        Vector3 position = Vector3.zero;
         int currentVertexIndex = 0;
-
         float horizontalPos = (width / 2) * -1;
         for (int i=colStart; i<=horizontalVertexNumber; i++) {
             float verticalPos = (height / 2) * -1; 
             for (int j=rowStart; j<=vertivcalVertexNumber; j++) {
-                if (currentVertexIndex == vertices.Length) {
+                if (currentVertexIndex == vertexTotal) {
                     break;
                 }
 
                 switch (side) {
                     case "front":
                     case "back":
-                        vertices[currentVertexIndex] = new Vector3(horizontalPos, verticalPos, forwardPos);
+                        position = new Vector3(horizontalPos, verticalPos, forwardPos);
                         break;
                     case "right":
                     case "left":
-                        vertices[currentVertexIndex] = new Vector3(forwardPos, verticalPos, horizontalPos);
+                        position = new Vector3(forwardPos, verticalPos, horizontalPos);
                         break;
                     case "top":
                     case "bot":
-                        vertices[currentVertexIndex] = new Vector3(horizontalPos, forwardPos, verticalPos);
+                        position = new Vector3(horizontalPos, forwardPos, verticalPos);
                         break;
                 };
+
+                // Create bone for vertex.
+                string name = bones.Count().ToString();
+                GenerateCell(position, name);
 
                 verticalPos += spacePerRow;
                 currentVertexIndex++;
             }
             horizontalPos += spacePerCol;
         }
-
-        mesh.vertices = mesh.vertices.Concat(vertices).ToArray();
     }
 
     private void CreateSquadTriangles(bool isCounterClockwise = false)
@@ -402,17 +315,26 @@ public class Creation : MonoBehaviour
         for (int i=0; i<cols-1; i++) {
             int startI = i * rows + (mesh.vertexCount - cols * rows);
             for (int j=0; j<rows-1; j++) {
-                int startJ = startI + j;
+                int aVertex = startI + j;
+                int bVertex = aVertex + cols + 1;
+                int cVertex = aVertex + cols;
+                int dVertex = aVertex + 1;
 
                 // Bottom Right triangle.
-                triangles[currentTriangleIndex++] = startJ;
-                triangles[currentTriangleIndex++] = startJ + cols + 1;
-                triangles[currentTriangleIndex++] = startJ + cols;
+                triangles[currentTriangleIndex++] = aVertex;
+                triangles[currentTriangleIndex++] = bVertex;
+                triangles[currentTriangleIndex++] = cVertex;
 
                 // Top Left triangle.
-                triangles[currentTriangleIndex++] = startJ;
-                triangles[currentTriangleIndex++] = startJ + 1;
-                triangles[currentTriangleIndex++] = startJ + cols + 1;
+                triangles[currentTriangleIndex++] = aVertex;
+                triangles[currentTriangleIndex++] = dVertex;
+                triangles[currentTriangleIndex++] = bVertex;
+
+                // Connect bones together.
+                CreateJoint(bones[aVertex], bones[bVertex]);
+                CreateJoint(bones[bVertex], bones[cVertex]);
+                CreateJoint(bones[cVertex], bones[aVertex]);
+                // CreateJoint(bones[aVertex], bones[dVertex]); // TODO:
             }
         }
 
@@ -444,18 +366,15 @@ public class Creation : MonoBehaviour
     private void CreateJoint(GameObject bone, GameObject connectedBone)
     {
         bone.AddComponent<SpringJoint>();
-        SpringJoint joint = bone.GetComponent<SpringJoint>();
+        SpringJoint[] joints = bone.GetComponents<SpringJoint>();
+        SpringJoint joint = joints[joints.Length - 1];
         joint.connectedBody = connectedBone.GetComponent<Rigidbody>();
         joint.autoConfigureConnectedAnchor = true;
-        joint.spring = 10;
+        joint.spring = 3;
     }
 
     private Vector3[] SpherizeVectors(Vector3[] vectors)
     {
-        Vector3 origin = Vector3.zero;
-        float size = 1;
-        float morphValue = 0.5f;
-
         for(int i = 0; i<vectors.Length; i++)
         {
             // Vector3 vector = vectors[i]-origin;
