@@ -15,6 +15,10 @@ public class Creation : MonoBehaviour
     private bool spherize = false;
     [SerializeField]
     private float colliderSize = 0.2f;
+    [SerializeField]
+    private float spring = 10;
+    [SerializeField]
+    private bool autoAnchor = false;
     
 
     private SkinnedMeshRenderer rend;
@@ -28,6 +32,15 @@ public class Creation : MonoBehaviour
     void Start()
     {
         CreateCube();
+
+        // for (int i = 0; i < mesh.vertices.Length; i++) {
+        //     for (int j = 0; j < mesh.vertices.Length; j++) {
+        //         if (i != j && mesh.vertices[i] == mesh.vertices[j]) {
+        //             Debug.Log(i + "----" + mesh.vertices[i]);
+        //             Debug.Log(i + " = " + j);
+        //         }
+        //     }
+        // }
     }
 
     // Update is called once per frame
@@ -55,7 +68,7 @@ public class Creation : MonoBehaviour
         mesh.RecalculateNormals();
 
         // Connect center to parent.
-        CreateJoint(centerBone, gameObject);
+        // CreateJoint(centerBone, gameObject);
 
         // Connect bones to center bone.
         for (int i = 1; i < bones.Length; i++) {
@@ -70,39 +83,39 @@ public class Creation : MonoBehaviour
     private void GenerateFront()
     {
         float forwardPos = (z / 2) * -1;
-        CreateSquadVertices(x, y, forwardPos, "front");
+        GenerateSquadCells(x, y, forwardPos, "front");
         CreateSquadTriangles();
     }
 
     private void GenerateBack()
     {
-        CreateSquadVertices(x, y, z/2, "back");
+        GenerateSquadCells(x, y, z/2, "back");
         CreateSquadTriangles(true);
     }
 
     private void GenerateRight()
     {
-        CreateSquadVertices(z, y, x/2, "right");
+        GenerateSquadCells(z, y, x/2, "right");
         CreateSquadTriangles();
     }
 
     private void GenerateLeft()
     {
         float forwardPos = (x / 2) * -1;
-        CreateSquadVertices(z, y, forwardPos, "left");
+        GenerateSquadCells(z, y, forwardPos, "left");
         CreateSquadTriangles(true);
     }
 
     private void GenerateTop()
     {
-        CreateSquadVertices(x, z, y/2, "top");
+        GenerateSquadCells(x, z, y/2, "top");
         CreateSquadTriangles();
     }
 
     private void GenerateBot()
     {
         float forwardPos = (y / 2) * -1;
-        CreateSquadVertices(x, z, forwardPos, "bot");
+        GenerateSquadCells(x, z, forwardPos, "bot");
         CreateSquadTriangles(true);
     }
 
@@ -117,8 +130,8 @@ public class Creation : MonoBehaviour
             };
         }
 
-        CreateBone(name, vertex);
-        SetBoneToWeight(bones.Length - 1, mesh.boneWeights.Length - 1);
+        int boneIndex = FindOrCreateBoneIndex(name, vertex);
+        SetBoneToWeight(boneIndex, mesh.boneWeights.Length - 1);
 
         return bones[bones.Length - 1];
     }
@@ -224,8 +237,50 @@ public class Creation : MonoBehaviour
         return position;
     }
 
-    private GameObject CreateBone(string name, Vector3 position)
+    private Vector3 GetVertexByIndex(int index)
     {
+        return mesh.vertices[index];
+    }
+
+    private GameObject GetBoneByIndex(int index)
+    {
+        return bones[index];
+    }
+
+    private GameObject GetBoneByPosition(Vector3 position)
+    {
+        return bones[FindBoneIndexByPosition(position)];
+    }
+
+    private int FindBoneIndexByPosition(Vector3 position)
+    {
+        int boneIndex = -1;
+        for (int i = 0; i < bones.Length; i++) {
+            GameObject bone = GetBoneByIndex(i);
+            if (bone.transform.localPosition != position) {
+                continue;
+            }
+
+            boneIndex = i;
+        }
+
+        return boneIndex;
+    }
+
+    /// <summary>
+    /// If any bone has same position which need be to created,
+    /// return it instead of create new one.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="position"></param>
+    /// <returns></returns>
+    private int FindOrCreateBoneIndex(string name, Vector3 position)
+    {
+        int boneIndex = FindBoneIndexByPosition(position);
+        if (boneIndex >= 0) {
+            return boneIndex;
+        }
+
         Transform[] tranBones = new Transform[1];
         Matrix4x4[] bindposes = new Matrix4x4[1];
 
@@ -255,10 +310,10 @@ public class Creation : MonoBehaviour
         };
         bones = bones.Concat(boneList).ToArray();
         
-        return bone;
+        return bones.Length - 1;
     }
 
-    private void CreateSquadVertices(float width, float height, float forwardPos, string side)
+    private void GenerateSquadCells(float width, float height, float forwardPos, string side)
     {
         float spacePerCol = width / (horizontalVertexNumber * 2);
         float spacePerRow = height / (vertivcalVertexNumber * 2);
@@ -331,9 +386,9 @@ public class Creation : MonoBehaviour
                 triangles[currentTriangleIndex++] = bVertex;
 
                 // Connect bones together.
-                CreateJoint(bones[aVertex], bones[bVertex]);
-                CreateJoint(bones[bVertex], bones[cVertex]);
-                CreateJoint(bones[cVertex], bones[aVertex]);
+                CreateJoint(GetBoneByPosition(GetVertexByIndex(aVertex)), GetBoneByPosition(GetVertexByIndex(bVertex)));
+                CreateJoint(GetBoneByPosition(GetVertexByIndex(bVertex)), GetBoneByPosition(GetVertexByIndex(cVertex)));
+                CreateJoint(GetBoneByPosition(GetVertexByIndex(cVertex)), GetBoneByPosition(GetVertexByIndex(aVertex)));
                 // CreateJoint(bones[aVertex], bones[dVertex]); // TODO:
             }
         }
@@ -369,8 +424,8 @@ public class Creation : MonoBehaviour
         SpringJoint[] joints = bone.GetComponents<SpringJoint>();
         SpringJoint joint = joints[joints.Length - 1];
         joint.connectedBody = connectedBone.GetComponent<Rigidbody>();
-        joint.autoConfigureConnectedAnchor = true;
-        joint.spring = 3;
+        joint.autoConfigureConnectedAnchor = autoAnchor;
+        joint.spring = spring;
     }
 
     private Vector3[] SpherizeVectors(Vector3[] vectors)
