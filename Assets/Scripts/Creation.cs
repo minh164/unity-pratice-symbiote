@@ -59,11 +59,8 @@ public class Creation : MonoBehaviour
         GameObject centerBone = GenerateCell(Vector3.zero, "0");
 
         GenerateFront();
-        GenerateBack();
         GenerateRight();
-        GenerateLeft();
         GenerateTop();
-        GenerateBot();
 
         mesh.RecalculateNormals();
 
@@ -71,9 +68,9 @@ public class Creation : MonoBehaviour
         // CreateJoint(centerBone, gameObject);
 
         // Connect bones to center bone.
-        for (int i = 1; i < bones.Length; i++) {
-            CreateJoint(bones[i], centerBone);
-        }
+        // for (int i = 1; i < bones.Length; i++) {
+        //     CreateJoint(bones[i], centerBone);
+        // }
 
         // Add Bones and Mesh into Renderer.
         rend.sharedMesh = mesh;
@@ -82,41 +79,50 @@ public class Creation : MonoBehaviour
 
     private void GenerateFront()
     {
+        float spacePerForward = z / (vertivcalVertexNumber * 2);
         float forwardPos = (z / 2) * -1;
-        GenerateSquadCells(x, y, forwardPos, "front");
-        CreateSquadTriangles();
-    }
-
-    private void GenerateBack()
-    {
-        GenerateSquadCells(x, y, z/2, "back");
-        CreateSquadTriangles(true);
+        int forwardStart = vertivcalVertexNumber * -1;
+        for (int i = forwardStart; i <= vertivcalVertexNumber; i++) {
+            if (spherize && i != forwardStart && i != vertivcalVertexNumber) {
+                forwardPos += spacePerForward;
+                continue;
+            }
+            GenerateSquadCells(x, y, forwardPos, "front");
+            CreateSquadTriangles(i == vertivcalVertexNumber);
+            forwardPos += spacePerForward;
+        }
     }
 
     private void GenerateRight()
     {
-        GenerateSquadCells(z, y, x/2, "right");
-        CreateSquadTriangles();
-    }
-
-    private void GenerateLeft()
-    {
+        float spacePerForward = x / (horizontalVertexNumber * 2);
         float forwardPos = (x / 2) * -1;
-        GenerateSquadCells(z, y, forwardPos, "left");
-        CreateSquadTriangles(true);
+        int forwardStart = horizontalVertexNumber * -1;
+        for (int i = forwardStart; i <= horizontalVertexNumber; i++) {
+            if (spherize && i != forwardStart && i != vertivcalVertexNumber) {
+                forwardPos += spacePerForward;
+                continue;
+            }
+            GenerateSquadCells(z, y, forwardPos, "right");
+            CreateSquadTriangles(i == forwardStart);
+            forwardPos += spacePerForward;
+        }
     }
 
     private void GenerateTop()
     {
-        GenerateSquadCells(x, z, y/2, "top");
-        CreateSquadTriangles();
-    }
-
-    private void GenerateBot()
-    {
+        float spacePerForward = y / (vertivcalVertexNumber * 2);
         float forwardPos = (y / 2) * -1;
-        GenerateSquadCells(x, z, forwardPos, "bot");
-        CreateSquadTriangles(true);
+        int forwardStart = vertivcalVertexNumber * -1;
+        for (int i = forwardStart; i <= vertivcalVertexNumber; i++) {
+            if (spherize && i != forwardStart && i != vertivcalVertexNumber) {
+                forwardPos += spacePerForward;
+                continue;
+            }
+            GenerateSquadCells(x, z, forwardPos, "top");
+            CreateSquadTriangles(i == forwardStart);
+            forwardPos += spacePerForward;
+        }
     }
 
     private GameObject GenerateCell(Vector3 position, string name)
@@ -351,7 +357,7 @@ public class Creation : MonoBehaviour
                 };
 
                 // Create bone for vertex.
-                string name = bones.Count().ToString();
+                string name = side + "-" + bones.Count().ToString();
                 GenerateCell(position, name);
 
                 verticalPos += spacePerRow;
@@ -389,7 +395,9 @@ public class Creation : MonoBehaviour
                 CreateJoint(GetBoneByPosition(GetVertexByIndex(aVertex)), GetBoneByPosition(GetVertexByIndex(bVertex)));
                 CreateJoint(GetBoneByPosition(GetVertexByIndex(bVertex)), GetBoneByPosition(GetVertexByIndex(cVertex)));
                 CreateJoint(GetBoneByPosition(GetVertexByIndex(cVertex)), GetBoneByPosition(GetVertexByIndex(aVertex)));
-                // CreateJoint(bones[aVertex], bones[dVertex]); // TODO:
+                CreateJoint(GetBoneByPosition(GetVertexByIndex(aVertex)), GetBoneByPosition(GetVertexByIndex(dVertex)));
+                CreateJoint(GetBoneByPosition(GetVertexByIndex(dVertex)), GetBoneByPosition(GetVertexByIndex(bVertex)));
+                CreateJoint(GetBoneByPosition(GetVertexByIndex(cVertex)), GetBoneByPosition(GetVertexByIndex(dVertex)));
             }
         }
 
