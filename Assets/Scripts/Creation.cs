@@ -11,6 +11,8 @@ public class Creation : MonoBehaviour
     public float x;
     public float y;
     public float z;
+    public bool freezePos = false;
+
     [SerializeField]
     private bool spherize = false;
     [SerializeField]
@@ -19,6 +21,8 @@ public class Creation : MonoBehaviour
     private float spring = 10;
     [SerializeField]
     private bool autoAnchor = false;
+    [SerializeField]
+    private bool enableCollision = true;
     
 
     private SkinnedMeshRenderer rend;
@@ -304,6 +308,12 @@ public class Creation : MonoBehaviour
 
         // Add rigid for bone.
         bone.AddComponent<Rigidbody>();
+        Rigidbody rigidbody = bone.GetComponent<Rigidbody>();
+        if (freezePos) {
+            rigidbody.constraints = RigidbodyConstraints.FreezePosition;
+        }
+
+        // Add collider.
         bone.AddComponent<SphereCollider>();
         SphereCollider collider = bone.GetComponent<SphereCollider>();
         collider.radius = colliderSize;
@@ -439,6 +449,7 @@ public class Creation : MonoBehaviour
         newJoint.connectedBody = connectedBone.GetComponent<Rigidbody>();
         newJoint.autoConfigureConnectedAnchor = autoAnchor;
         newJoint.spring = spring;
+        newJoint.enableCollision = enableCollision;
     }
 
     private bool IsExistedJoint(GameObject bone, GameObject connectedBone)
