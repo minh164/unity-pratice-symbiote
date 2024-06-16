@@ -23,6 +23,8 @@ public class Creation : MonoBehaviour
     private bool autoAnchor = false;
     [SerializeField]
     private bool enableCollision = true;
+    [SerializeField]
+    private float damper = 2;
     
 
     private SkinnedMeshRenderer rend;
@@ -450,6 +452,7 @@ public class Creation : MonoBehaviour
         newJoint.autoConfigureConnectedAnchor = autoAnchor;
         newJoint.spring = spring;
         newJoint.enableCollision = enableCollision;
+        newJoint.damper = damper;
     }
 
     private bool IsExistedJoint(GameObject bone, GameObject connectedBone)
