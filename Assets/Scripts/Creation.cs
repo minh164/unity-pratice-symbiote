@@ -55,7 +55,13 @@ public class Creation : MonoBehaviour
     }
 
     private void CreateCube()
-    {
+    {   
+        if (freezePos) {
+            Rigidbody rigidbody = gameObject.GetComponent<Rigidbody>();
+            rigidbody.constraints = RigidbodyConstraints.FreezePosition;
+
+        }
+
         gameObject.AddComponent<SkinnedMeshRenderer>();
         rend = gameObject.GetComponent<SkinnedMeshRenderer>();
 
@@ -369,7 +375,7 @@ public class Creation : MonoBehaviour
                 };
 
                 // Create bone for vertex.
-                string name = side + "-" + bones.Count().ToString();
+                string name = bones.Count().ToString();
                 GenerateCell(position, name);
 
                 verticalPos += spacePerRow;
@@ -418,24 +424,6 @@ public class Creation : MonoBehaviour
         }
 
         mesh.triangles = mesh.triangles.Concat(triangles).ToArray();
-    }
-
-    private Dictionary<string, int> GetSquadCornerIndexes(int fromIndex, int toIndex)
-    {
-        int colTotalIndex = horizontalVertexNumber * 2;
-        int rowTotalIndex = vertivcalVertexNumber * 2;
-
-        int topLeft = fromIndex + rowTotalIndex;
-        int topRight = topLeft + (colTotalIndex * rowTotalIndex) + colTotalIndex;
-
-        Dictionary<string, int> cornerIndexes = new Dictionary<string, int>() {
-            {"bot_left", fromIndex},    
-            {"top_left", topLeft},    
-            {"top_right", topRight},
-            {"bot_right", topRight - rowTotalIndex},    
-        };
-
-        return cornerIndexes;
     }
 
     private void CreateJoint(GameObject bone, GameObject connectedBone)
