@@ -33,11 +33,13 @@ public class Creation : MonoBehaviour
     private int vertivcalVertexNumber = 2; // From negative number to postive number of vertex range on vertical.
 
     private GameObject[] bones = new GameObject[]{};
+    private GameObject centerBone;
 
     // Start is called before the first frame update
     void Start()
     {
         CreateCube();
+        
 
         // for (int i = 0; i < mesh.vertices.Length; i++) {
         //     for (int j = 0; j < mesh.vertices.Length; j++) {
@@ -52,6 +54,17 @@ public class Creation : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
+    }
+
+    void FixedUpdate()
+    {
+        // if (Vector3.Distance(transform.position, centerBone.transform.position) > 0.2f) {
+        //     transform.position = centerBone.transform.position;
+        // }
+        // Debug.Log("p--" + transform.position);
+        // Debug.Log("c--" + centerBone.transform.position);
+        // Debug.Log("---------------------------------------");
     }
 
     private void CreateCube()
@@ -68,7 +81,7 @@ public class Creation : MonoBehaviour
         mesh = new Mesh();
 
         // Add Center bone.
-        GameObject centerBone = GenerateCell(Vector3.zero, "0");
+        centerBone = GenerateCell(Vector3.zero, "0");
 
         GenerateFront();
         GenerateRight();
