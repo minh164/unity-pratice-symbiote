@@ -31,17 +31,19 @@ public class SymVertex
         return _mesh.vertices[index];
     }
 
-    public Vector3[] SpherizeVectors(Vector3[] vectors)
+    public void SpherizeVectors()
     {
-        for(int i = 0; i<vectors.Length; i++)
+        Vector3[] vectors = new Vector3[] {};
+        for(int i = 0; i<_mesh.vertices.Length; i++)
         {
             // Vector3 vector = vectors[i]-origin;
             // Vector3 sphereVector = vector.normalized * (size/2)*1.67f;
             // Vector3 lerpdVector = Vector3.Lerp(vector,sphereVector,morphValue);
             // vectors[i] = origin+lerpdVector;
-            Vector3 vector = vectors[i].normalized;
-            vectors[i] = vector;
+            Vector3[] addVector = new Vector3[1] {_mesh.vertices[i].normalized};
+            vectors = vectors.Concat(addVector).ToArray();
         }
-        return vectors;
+
+        _mesh.vertices = vectors;
     }
 }

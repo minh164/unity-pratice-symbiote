@@ -220,4 +220,16 @@ public class SymBone
         cloneWeights[weightIndex] = weight;
         _mesh.boneWeights = cloneWeights;
     }
+
+    public void SpherizeBones()
+    {
+        for(int i = 0; i<_bones.Length; i++)
+        {
+            GameObject bone = _bones[i];
+            bone.transform.localPosition = bone.transform.localPosition.normalized;
+
+            _bones[i] = bone;
+            _rend.bones[i] = bone.transform;
+        }
+    }
 }

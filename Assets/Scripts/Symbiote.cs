@@ -35,6 +35,7 @@ public class Symbiote : MonoBehaviour
     private GameObject centerBone;
     private SymBone symBone;
     private SymVertex symVertex;
+    private SymDebug symDebug;
 
     // Start is called before the first frame update
     void Start()
@@ -46,6 +47,7 @@ public class Symbiote : MonoBehaviour
 
         symBone = new SymBone(this, bones, rend, mesh);
         symVertex = new SymVertex(mesh);
+        symDebug = new SymDebug();
 
         CreateCube();
     }
@@ -80,6 +82,11 @@ public class Symbiote : MonoBehaviour
         GenerateFront();
         GenerateRight();
         GenerateTop();
+
+        if (spherize) {
+            symVertex.SpherizeVectors();
+            symBone.SpherizeBones();
+        }
 
         mesh.RecalculateNormals();
 
@@ -283,6 +290,8 @@ public class Symbiote : MonoBehaviour
         newJoint.spring = spring;
         newJoint.enableCollision = enableCollision;
         newJoint.damper = damper;
+
+        // Debug.DrawLine(bone.transform.position, connectedBone.transform.position);
     }
 
     private bool IsExistedJoint(GameObject bone, GameObject connectedBone)

@@ -3,15 +3,22 @@ using UnityEngine;
 
 public class SymDebug
 {
-    private void DebugVertices(Vector3[] vertices)
+    public void DebugVertices(Vector3[] vertices)
     {
         for (int i=0; i<vertices.Length; i++) {
             Debug.Log(vertices[i]);
             Debug.Log(i);
         }
     }
+    public void DebugRendBonePostions(Transform[] boneTransforms)
+    {
+        for (int i=0; i<boneTransforms.Length; i++) {
+            Debug.Log(boneTransforms[i].position);
+            Debug.Log(i);
+        }
+    }
 
-    private void DebugTriangles(int[] triangles)
+    public void DebugTriangles(int[] triangles)
     {
         int[] triangle = new int[3];
         int currentIndex = 0;
@@ -26,7 +33,7 @@ public class SymDebug
         }
     }
 
-    private void DebugCornerIndexes(Dictionary<string, int> cornerIndexes)
+    public void DebugCornerIndexes(Dictionary<string, int> cornerIndexes)
     {
         Debug.Log("bot left: " + cornerIndexes["bot_left"]);
         Debug.Log("top left: " + cornerIndexes["top_left"]);
@@ -34,7 +41,7 @@ public class SymDebug
         Debug.Log("bot right: " + cornerIndexes["bot_right"]);
     }
 
-    private void DebugWeight(BoneWeight weight)
+    public void DebugWeight(BoneWeight weight)
     {
         Debug.Log("index0: " + weight.boneIndex0);
         Debug.Log("index1: " + weight.boneIndex1);
