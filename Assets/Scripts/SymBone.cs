@@ -96,6 +96,11 @@ public class SymBone
             return boneIndex;
         }
 
+        return CreateBoneIndex(name, position, colliderSize, freezePos);
+    }
+
+    public int CreateBoneIndex(string name, Vector3 position, float colliderSize = 0.2f, bool freezePos = false)
+    {
         Transform[] tranBones = new Transform[1];
         Matrix4x4[] bindposes = new Matrix4x4[1];
 

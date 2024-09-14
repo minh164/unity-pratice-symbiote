@@ -14,6 +14,8 @@ public class Symbiote : MonoBehaviour
     public bool freezePos = false;
 
     [SerializeField]
+    private bool onGizmo = false;
+    [SerializeField]
     private bool spherize = false;
     [SerializeField]
     private float colliderSize = 0.2f;
@@ -58,6 +60,17 @@ public class Symbiote : MonoBehaviour
         
     }
 
+    void OnDrawGizmos()
+    {
+        if (! mesh || ! onGizmo) {
+            return;
+        }
+
+        // symDebug.GizmoMeshVertices(mesh, transform.position);
+        // symDebug.GizmoRendBones(rend);
+        symDebug.GizmoVerticesAndBones(mesh, transform.position, rend);
+    }
+
     void FixedUpdate()
     {
         // if (Vector3.Distance(transform.position, centerBone.transform.position) > 0.2f) {
@@ -80,12 +93,12 @@ public class Symbiote : MonoBehaviour
         centerBone = GenerateCell(Vector3.zero, "0");
 
         GenerateFront();
-        GenerateRight();
+        GenerateRight(); 
         GenerateTop();
 
         if (spherize) {
-            symVertex.SpherizeVectors();
             symBone.SpherizeBones();
+            symVertex.SpherizeVectors();
         }
 
         mesh.RecalculateNormals();

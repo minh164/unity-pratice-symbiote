@@ -12,6 +12,16 @@ public class SymVertex
         _mesh = mesh;
     }
 
+    public Vector3 FindOrCreateVertex(Vector3 position, bool spherize = false)
+    {
+        int vertexIndex = FindVertexIndexByPosition(position);
+        if (vertexIndex >= 0) {
+            return position;
+        }
+
+        return CreateVertex(position, spherize);
+    }
+
     public Vector3 CreateVertex(Vector3 position, bool spherize = false)
     {
         if (spherize) {
@@ -29,6 +39,20 @@ public class SymVertex
     public Vector3 GetVertexByIndex(int index)
     {
         return _mesh.vertices[index];
+    }
+
+    public int FindVertexIndexByPosition(Vector3 position)
+    {
+        int vertexIndex = -1;
+        for (int i = 0; i < _mesh.vertices.Length; i++) {
+            if (_mesh.vertices[i] != position) {
+                continue;
+            }
+
+            vertexIndex = i;
+        }
+
+        return vertexIndex;
     }
 
     public void SpherizeVectors()

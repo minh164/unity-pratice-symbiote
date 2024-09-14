@@ -10,6 +10,7 @@ public class SymDebug
             Debug.Log(i);
         }
     }
+
     public void DebugRendBonePostions(Transform[] boneTransforms)
     {
         for (int i=0; i<boneTransforms.Length; i++) {
@@ -51,5 +52,71 @@ public class SymDebug
         Debug.Log("w1: " + weight.weight1);
         Debug.Log("w2: " + weight.weight2);
         Debug.Log("w3: " + weight.weight3);
+    }
+
+    public void DrawVertices(Vector3[] vertices)
+    {
+        for (int i=0; i<vertices.Length; i++) {
+            Debug.DrawLine(vertices[i], vertices[i]);
+        }
+    }
+
+    public void GizmoMeshVertices(Mesh mesh, Vector3 mainPosition)
+    {
+        for (int i = 0; i < mesh.vertices.Length; i++) {
+            float size = 0.1f;
+            Vector3 vertexPos = mainPosition - mesh.vertices[i];
+            Gizmos.color = new Color(1, 0, 0, 1);
+            Gizmos.DrawCube(vertexPos, new Vector3(size, size, size));
+            Debug.Log("vector: " + vertexPos);
+        }
+    }
+
+    public void GizmoRendBones(SkinnedMeshRenderer rend)
+    {
+        for (int i = 0; i < rend.bones.Length; i++) {
+            float size2 = 0.1f;
+            Vector3 bonePos = rend.bones[i].position;
+            Gizmos.color = new Color(0, 173, 255, 0.5f);
+            Gizmos.DrawSphere(bonePos, size2);
+            Debug.Log("bone: " + bonePos);
+        }
+    }
+
+    public void GizmoVerticesAndBones(Mesh mesh, Vector3 mainPosition, SkinnedMeshRenderer rend)
+    {
+        for (int i = 0; i < mesh.vertices.Length; i++) {
+            float size = 0.1f;
+            Vector3 vertexPos = mainPosition - mesh.vertices[i];
+            Gizmos.color = new Color(1, 0, 0, 1);
+            Gizmos.DrawCube(vertexPos, new Vector3(size, size, size));
+            // Debug.Log("vector: " + mesh.vertices[i]);
+
+            if (i < rend.bones.Length) {
+                float size2 = 0.1f;
+                Vector3 bonePos = rend.bones[i].position;
+                Gizmos.color = new Color(0, 173, 255, 0.5f);
+                Gizmos.DrawSphere(bonePos, size2);
+                // Debug.Log("bone " + i + ": " + rend.bones[i].localPosition);
+            }
+            // Debug.Log("-------------------------------------");
+        }
+    }
+
+    public void CheckMatchedVertexAndBone(Mesh mesh, SkinnedMeshRenderer rend)
+    {
+        for (int i = 0; i < mesh.vertices.Length; i++) {
+            Vector3 vertex = mesh.vertices[i];
+
+            if (i < rend.bones.Length) {
+                Vector3 bone = rend.bones[i].localPosition;
+
+                if (! vertex.Equals(bone)) {
+                    Debug.Log("vector: " + mesh.vertices[i]);
+                    Debug.Log("bone " + i + ": " + rend.bones[i].localPosition);
+                    Debug.Log("-------------------------------------");
+                }
+            }
+        }
     }
 }
