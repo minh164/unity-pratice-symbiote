@@ -28,7 +28,7 @@ public class Symbiote : MonoBehaviour
     [SerializeField]
     private float damper = 2;
     
-
+    private Dictionary<int, int> cells = new Dictionary<int, int>{}; // Each cell includes index is vertex index and value is bone index.
     private SkinnedMeshRenderer rend;
     private Mesh mesh;
     private int horizontalVertexNumber = 2; // From negative number to postive number of vertex range on horizontal.
@@ -57,7 +57,7 @@ public class Symbiote : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        UpdateCellPositions();
     }
 
     void OnDrawGizmos()
@@ -171,12 +171,16 @@ public class Symbiote : MonoBehaviour
         // Add first bone weight, others are auto-added when create new vertex.
         if (mesh.boneWeights.Length <= 0) {
             mesh.boneWeights = new BoneWeight[] {
-                new BoneWeight{weight0 = 1, boneIndex0 = 0}    
+                new BoneWeight{weight0 = 1, boneIndex0 = 0}
             };
         }
 
         int boneIndex = symBone.FindOrCreateBoneIndex(name, vertex, colliderSize, freezePos);
         symBone.SetBoneToWeight(boneIndex, mesh.boneWeights.Length - 1);
+
+        // Add cell.
+        int vertexIndex = symVertex.FindVertexIndexByPosition(position);
+        cells.Add(vertexIndex, boneIndex);
 
         return symBone.GetLastBone();
     }
@@ -227,6 +231,19 @@ public class Symbiote : MonoBehaviour
             }
             horizontalPos += spacePerCol;
         }
+    }
+
+    private void UpdateCellPositions()
+    {
+        foreach (var cell in cells) {
+            Vector3[] cloneVertices = mesh.vertices;
+            int vertexIndex = cell.Key;
+            int boneIndex = cell.Value;
+            cloneVertices[vertexIndex] = rend.bones[boneIndex].localPosition;
+            mesh.vertices = cloneVertices;
+        }
+        mesh.RecalculateNormals();
+        rend.sharedMesh = mesh;
     }
 
     private void CreateSquadTriangles(bool isCounterClockwise = false)
