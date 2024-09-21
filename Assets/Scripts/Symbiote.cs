@@ -32,7 +32,7 @@ public class Symbiote : MonoBehaviour
     private SkinnedMeshRenderer rend;
     private Mesh mesh;
     private int horizontalVertexNumber = 2; // From negative number to postive number of vertex range on horizontal.
-    private int vertivcalVertexNumber = 2; // From negative number to postive number of vertex range on vertical.
+    private int verticalVertexNumber = 2; // From negative number to postive number of vertex range on vertical.
 
     private GameObject centerBone;
     private SymBone symBone;
@@ -95,6 +95,7 @@ public class Symbiote : MonoBehaviour
         GenerateFront();
         GenerateRight(); 
         GenerateTop();
+        GenerateCross();
 
         if (spherize) {
             symBone.SpherizeBones();
@@ -118,16 +119,12 @@ public class Symbiote : MonoBehaviour
 
     private void GenerateFront()
     {
-        float spacePerForward = z / (vertivcalVertexNumber * 2);
+        float spacePerForward = z / (verticalVertexNumber * 2);
         float forwardPos = (z / 2) * -1;
-        int forwardStart = vertivcalVertexNumber * -1;
-        for (int i = forwardStart; i <= vertivcalVertexNumber; i++) {
-            if (spherize && i != forwardStart && i != vertivcalVertexNumber) {
-                forwardPos += spacePerForward;
-                continue;
-            }
+        int forwardStart = verticalVertexNumber * -1;
+        for (int i = forwardStart; i <= verticalVertexNumber; i++) {
             GenerateSquadCells(x, y, forwardPos, "front");
-            CreateSquadTriangles(i == vertivcalVertexNumber);
+            CreateSquadTriangles(i == verticalVertexNumber);
             forwardPos += spacePerForward;
         }
     }
@@ -138,10 +135,6 @@ public class Symbiote : MonoBehaviour
         float forwardPos = (x / 2) * -1;
         int forwardStart = horizontalVertexNumber * -1;
         for (int i = forwardStart; i <= horizontalVertexNumber; i++) {
-            if (spherize && i != forwardStart && i != vertivcalVertexNumber) {
-                forwardPos += spacePerForward;
-                continue;
-            }
             GenerateSquadCells(z, y, forwardPos, "right");
             CreateSquadTriangles(i == forwardStart);
             forwardPos += spacePerForward;
@@ -150,18 +143,46 @@ public class Symbiote : MonoBehaviour
 
     private void GenerateTop()
     {
-        float spacePerForward = y / (vertivcalVertexNumber * 2);
+        float spacePerForward = y / (verticalVertexNumber * 2);
         float forwardPos = (y / 2) * -1;
-        int forwardStart = vertivcalVertexNumber * -1;
-        for (int i = forwardStart; i <= vertivcalVertexNumber; i++) {
-            if (spherize && i != forwardStart && i != vertivcalVertexNumber) {
-                forwardPos += spacePerForward;
-                continue;
-            }
+        int forwardStart = verticalVertexNumber * -1;
+        for (int i = forwardStart; i <= verticalVertexNumber; i++) {
             GenerateSquadCells(x, z, forwardPos, "top");
             CreateSquadTriangles(i == forwardStart);
             forwardPos += spacePerForward;
         }
+    }
+
+    private void GenerateCross()
+    {
+        // A Squad has one middle cross and two half parts of crosses.
+        int totalCrosses = (horizontalVertexNumber * 2 + 1) + (verticalVertexNumber * 2 + 1) - 3;
+        int halfCrosses = (totalCrosses - 1) / 2;
+
+        float spacePerHorizontal = x / (horizontalVertexNumber * 2);
+        float spacePerVertical = z / (verticalVertexNumber * 2);
+
+        // Process Right Triagle on top left.
+        float verticalPos = z / 2;
+        int horizontalVertexTotal = 1;
+        for (int i = 1; i <= halfCrosses; i++) {
+            horizontalVertexTotal += 1;
+            verticalPos -= spacePerVertical;
+
+            // This vertex is start point to generate cross squad.
+            Vector3 vertexStartPosition = new Vector3((x / 2) * -1, (y / 2) * -1, verticalPos);
+
+            GenerateCrossSquadCells(
+                vertexStartPosition,
+                x / (horizontalVertexNumber * 2),
+                y / (verticalVertexNumber * 2),
+                z / (verticalVertexNumber * 2),
+                horizontalVertexTotal,
+                verticalVertexNumber * 2 + 1
+            );
+        }
+
+        // Process Right Triagle on bottom right.
     }
 
     private GameObject GenerateCell(Vector3 position, string name)
@@ -188,12 +209,12 @@ public class Symbiote : MonoBehaviour
     private void GenerateSquadCells(float width, float height, float forwardPos, string side)
     {
         float spacePerCol = width / (horizontalVertexNumber * 2);
-        float spacePerRow = height / (vertivcalVertexNumber * 2);
+        float spacePerRow = height / (verticalVertexNumber * 2);
         int cols = horizontalVertexNumber * 2 + 1;
-        int rows = vertivcalVertexNumber * 2 + 1;
+        int rows = verticalVertexNumber * 2 + 1;
 
         int colStart = horizontalVertexNumber * -1;
-        int rowStart = vertivcalVertexNumber * -1;
+        int rowStart = verticalVertexNumber * -1;
 
         // Generate vertices.
         int vertexTotal = cols * rows;
@@ -202,7 +223,7 @@ public class Symbiote : MonoBehaviour
         float horizontalPos = (width / 2) * -1;
         for (int i=colStart; i<=horizontalVertexNumber; i++) {
             float verticalPos = (height / 2) * -1; 
-            for (int j=rowStart; j<=vertivcalVertexNumber; j++) {
+            for (int j=rowStart; j<=verticalVertexNumber; j++) {
                 if (currentVertexIndex == vertexTotal) {
                     break;
                 }
@@ -233,6 +254,44 @@ public class Symbiote : MonoBehaviour
         }
     }
 
+    private void GenerateCrossSquadCells(
+        Vector3 vertexStartPosition,
+        float spacePerHorizontal,
+        float spacePerVertical,
+        float spacePerForward,
+        int horizontalVertexTotal,
+        int verticalVertexTotal
+    )
+    {
+        float horizontalPos = vertexStartPosition.x;
+        float forwardPos = vertexStartPosition.z;
+        
+        // Generate vertices.
+        int vertexTotal = horizontalVertexTotal * verticalVertexTotal;
+        int currentVertexIndex = 0;
+
+        for (int i=1; i<=horizontalVertexTotal; i++) {
+            float verticalPos = vertexStartPosition.y;
+             
+            for (int j=1; j<=verticalVertexTotal; j++) {
+                if (currentVertexIndex == vertexTotal) {
+                    break;
+                }
+
+                Vector3 position = new Vector3(horizontalPos, verticalPos, forwardPos);
+
+                // Create bone for vertex.
+                string name = symBone.CountBones().ToString();
+                GenerateCell(position, name);
+
+                verticalPos += spacePerVertical;
+                currentVertexIndex++;
+            }
+            horizontalPos += spacePerHorizontal;
+            forwardPos += spacePerForward;
+        }
+    }
+
     private void UpdateCellPositions()
     {
         foreach (var cell in cells) {
@@ -249,7 +308,7 @@ public class Symbiote : MonoBehaviour
     private void CreateSquadTriangles(bool isCounterClockwise = false)
     {
         int cols = horizontalVertexNumber * 2 + 1;
-        int rows = vertivcalVertexNumber * 2 + 1;
+        int rows = verticalVertexNumber * 2 + 1;
         int[] triangles = new int[(cols-1)*(rows-1)*3*2];
         int currentTriangleIndex = 0;
         for (int i=0; i<cols-1; i++) {

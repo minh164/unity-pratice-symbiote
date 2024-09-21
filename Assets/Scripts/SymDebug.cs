@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -65,7 +66,7 @@ public class SymDebug
     {
         for (int i = 0; i < mesh.vertices.Length; i++) {
             float size = 0.1f;
-            Vector3 vertexPos = mainPosition - mesh.vertices[i];
+            Vector3 vertexPos = mainPosition - mesh.vertices[i]; // Occur issue with cross verteices
             Gizmos.color = new Color(1, 0, 0, 1);
             Gizmos.DrawCube(vertexPos, new Vector3(size, size, size));
             Debug.Log("vector: " + vertexPos);
@@ -118,5 +119,17 @@ public class SymDebug
                 }
             }
         }
+    }
+
+    private double CalculateHypotenuse(double sideA, double sideB)
+    {
+        // Using Pythagorean theorem (a right-triangle has two sides and one hypotenuse). 
+        double hypotenuse = Math.Sqrt((sideA * sideA) + (sideB * sideB));
+
+        Debug.Log(sideA);
+        Debug.Log(sideB);
+        Debug.Log(hypotenuse);
+
+        return hypotenuse;
     }
 }

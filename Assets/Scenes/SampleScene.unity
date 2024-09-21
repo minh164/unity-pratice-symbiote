@@ -869,9 +869,14 @@ MonoBehaviour:
   x: 2
   y: 2
   z: 2
+  freezePos: 0
+  onGizmo: 1
   spherize: 0
-  colliderSize: 0.4
+  colliderSize: 0.1
   spring: 1
+  autoAnchor: 0
+  enableCollision: 1
+  damper: 2
 --- !u!4 &1150913317
 Transform:
   m_ObjectHideFlags: 0
@@ -881,7 +886,7 @@ Transform:
   m_GameObject: {fileID: 1150913314}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 5.76, z: 0}
+  m_LocalPosition: {x: 0, y: 5.44, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
