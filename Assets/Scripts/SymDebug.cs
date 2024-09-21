@@ -66,10 +66,16 @@ public class SymDebug
     {
         for (int i = 0; i < mesh.vertices.Length; i++) {
             float size = 0.1f;
-            Vector3 vertexPos = mainPosition - mesh.vertices[i]; // Occur issue with cross verteices
+            Vector3 vertexPos = new Vector3(
+                mesh.vertices[i].x,
+                mainPosition.y - mesh.vertices[i].y,
+                mesh.vertices[i].z
+            );
             Gizmos.color = new Color(1, 0, 0, 1);
             Gizmos.DrawCube(vertexPos, new Vector3(size, size, size));
             Debug.Log("vector: " + vertexPos);
+            Debug.Log(mainPosition);
+            Debug.Log(mesh.vertices[i]);
         }
     }
 
@@ -88,7 +94,11 @@ public class SymDebug
     {
         for (int i = 0; i < mesh.vertices.Length; i++) {
             float size = 0.1f;
-            Vector3 vertexPos = mainPosition - mesh.vertices[i];
+            Vector3 vertexPos = new Vector3(
+                mesh.vertices[i].x,
+                mainPosition.y - mesh.vertices[i].y,
+                mesh.vertices[i].z
+            );
             Gizmos.color = new Color(1, 0, 0, 1);
             Gizmos.DrawCube(vertexPos, new Vector3(size, size, size));
             // Debug.Log("vector: " + mesh.vertices[i]);
