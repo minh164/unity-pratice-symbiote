@@ -93,8 +93,8 @@ public class Symbiote : MonoBehaviour
         centerBone = GenerateCell(Vector3.zero, "0");
 
         GenerateFront();
-        // GenerateRight(); 
-        // GenerateTop();
+        GenerateRight();
+        GenerateTop();
         GenerateCross();
 
         if (spherize) {
