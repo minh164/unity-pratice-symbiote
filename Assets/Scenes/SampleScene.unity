@@ -867,8 +867,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mat: {fileID: 2100000, guid: 82feb17f937cf440daf82ea0d3b0107a, type: 2}
   x: 2
-  y: 2
-  z: 2
+  y: 3
+  z: 4
   freezePos: 0
   onGizmo: 1
   spherize: 0

@@ -93,8 +93,8 @@ public class Symbiote : MonoBehaviour
         centerBone = GenerateCell(Vector3.zero, "0");
 
         GenerateFront();
-        GenerateRight(); 
-        GenerateTop();
+        // GenerateRight(); 
+        // GenerateTop();
         GenerateCross();
 
         if (spherize) {
@@ -124,7 +124,11 @@ public class Symbiote : MonoBehaviour
         int forwardStart = verticalVertexNumber * -1;
         for (int i = forwardStart; i <= verticalVertexNumber; i++) {
             GenerateSquadCells(x, y, forwardPos, "front");
-            CreateSquadTriangles(i == verticalVertexNumber);
+            CreateSquadTriangles(
+                horizontalVertexNumber * 2 + 1,
+                verticalVertexNumber * 2 + 1,
+                i == verticalVertexNumber
+            );
             forwardPos += spacePerForward;
         }
     }
@@ -136,7 +140,11 @@ public class Symbiote : MonoBehaviour
         int forwardStart = horizontalVertexNumber * -1;
         for (int i = forwardStart; i <= horizontalVertexNumber; i++) {
             GenerateSquadCells(z, y, forwardPos, "right");
-            CreateSquadTriangles(i == forwardStart);
+            CreateSquadTriangles(
+                horizontalVertexNumber * 2 + 1,
+                verticalVertexNumber * 2 + 1,
+                i == forwardStart
+            );
             forwardPos += spacePerForward;
         }
     }
@@ -148,7 +156,11 @@ public class Symbiote : MonoBehaviour
         int forwardStart = verticalVertexNumber * -1;
         for (int i = forwardStart; i <= verticalVertexNumber; i++) {
             GenerateSquadCells(x, z, forwardPos, "top");
-            CreateSquadTriangles(i == forwardStart);
+            CreateSquadTriangles(
+                horizontalVertexNumber * 2 + 1,
+                verticalVertexNumber * 2 + 1,
+                i == forwardStart
+            );
             forwardPos += spacePerForward;
         }
     }
@@ -177,6 +189,10 @@ public class Symbiote : MonoBehaviour
                 x / (horizontalVertexNumber * 2),
                 y / (verticalVertexNumber * 2),
                 z / (verticalVertexNumber * 2),
+                horizontalVertexTotal,
+                verticalVertexNumber * 2 + 1
+            );
+            CreateSquadTriangles(
                 horizontalVertexTotal,
                 verticalVertexNumber * 2 + 1
             );
@@ -305,18 +321,18 @@ public class Symbiote : MonoBehaviour
         rend.sharedMesh = mesh;
     }
 
-    private void CreateSquadTriangles(bool isCounterClockwise = false)
+    private void CreateSquadTriangles(int horizontalVertexTotal, int verticalVertexTotal, bool isCounterClockwise = false)
     {
-        int cols = horizontalVertexNumber * 2 + 1;
-        int rows = verticalVertexNumber * 2 + 1;
+        int cols = horizontalVertexTotal;
+        int rows = verticalVertexTotal;
         int[] triangles = new int[(cols-1)*(rows-1)*3*2];
         int currentTriangleIndex = 0;
         for (int i=0; i<cols-1; i++) {
             int startI = i * rows + (mesh.vertexCount - cols * rows);
             for (int j=0; j<rows-1; j++) {
                 int aVertex = startI + j;
-                int bVertex = aVertex + cols + 1;
-                int cVertex = aVertex + cols;
+                int bVertex = aVertex + rows + 1;
+                int cVertex = aVertex + rows;
                 int dVertex = aVertex + 1;
 
                 // Bottom Right triangle.
@@ -381,6 +397,9 @@ public class Symbiote : MonoBehaviour
         newJoint.damper = damper;
 
         // Debug.DrawLine(bone.transform.position, connectedBone.transform.position);
+        // Debug.Log(bone.transform.position);
+        // Debug.Log(connectedBone.transform.position);
+        // Debug.Log("------");
     }
 
     private bool IsExistedJoint(GameObject bone, GameObject connectedBone)
