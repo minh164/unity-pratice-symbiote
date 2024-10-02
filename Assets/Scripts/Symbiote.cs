@@ -96,6 +96,7 @@ public class Symbiote : MonoBehaviour
         GenerateRight();
         GenerateTop();
         GenerateCross();
+        GenerateCross(true);
 
         if (spherize) {
             symBone.SpherizeBones();
@@ -165,24 +166,52 @@ public class Symbiote : MonoBehaviour
         }
     }
 
-    private void GenerateCross()
+    private void GenerateCross(bool rightSide = false)
     {
-        // A Squad has one middle cross and two half parts of crosses.
+        // A Squad is separated by two triangles and 
+        // has one middle cross and two half parts of crosses (half ones on each triangle).
         int totalCrosses = (horizontalVertexNumber * 2 + 1) + (verticalVertexNumber * 2 + 1) - 3;
         int halfCrosses = (totalCrosses - 1) / 2;
 
+        // Which the side is crosses will be at.
+        int side = rightSide ? -1 : 1;
+
         float spacePerHorizontal = x / (horizontalVertexNumber * 2);
         float spacePerVertical = z / (verticalVertexNumber * 2);
-
-        // Process Right Triagle on top left.
-        float verticalPos = z / 2;
+        float verticalPos = 0;
+        float horizontalPos = 0;
         int horizontalVertexTotal = 1;
+
+        // Process Right Triagle on top.
+        horizontalPos = (x / 2) * -1 * side;
+        verticalPos = z / 2;
         for (int i = 1; i <= halfCrosses; i++) {
             horizontalVertexTotal += 1;
             verticalPos -= spacePerVertical;
 
+            GenerateCrossSquad();
+        }
+
+        // Process Right Triagle on bottom.
+        horizontalPos = (x / 2) * side;
+        verticalPos = (z / 2) * -1;
+        horizontalVertexTotal = 1;
+        for (int i = 1; i <= halfCrosses; i++) {
+            horizontalVertexTotal += 1;
+
+            if (rightSide) {
+                horizontalPos += spacePerHorizontal;
+            } else {
+                horizontalPos -= spacePerHorizontal;
+            }
+
+            GenerateCrossSquad();
+        }
+
+        void GenerateCrossSquad()
+        {
             // This vertex is start point to generate cross squad.
-            Vector3 vertexStartPosition = new Vector3((x / 2) * -1, (y / 2) * -1, verticalPos);
+            Vector3 vertexStartPosition = new Vector3(horizontalPos, (y / 2) * -1, verticalPos);
 
             GenerateCrossSquadCells(
                 vertexStartPosition,
@@ -190,15 +219,15 @@ public class Symbiote : MonoBehaviour
                 y / (verticalVertexNumber * 2),
                 z / (verticalVertexNumber * 2),
                 horizontalVertexTotal,
-                verticalVertexNumber * 2 + 1
+                verticalVertexNumber * 2 + 1,
+                rightSide
             );
             CreateSquadTriangles(
                 horizontalVertexTotal,
-                verticalVertexNumber * 2 + 1
+                verticalVertexNumber * 2 + 1,
+                rightSide
             );
         }
-
-        // Process Right Triagle on bottom right.
     }
 
     private GameObject GenerateCell(Vector3 position, string name)
@@ -276,7 +305,8 @@ public class Symbiote : MonoBehaviour
         float spacePerVertical,
         float spacePerForward,
         int horizontalVertexTotal,
-        int verticalVertexTotal
+        int verticalVertexTotal,
+        bool rightSide = false
     )
     {
         float horizontalPos = vertexStartPosition.x;
@@ -303,8 +333,13 @@ public class Symbiote : MonoBehaviour
                 verticalPos += spacePerVertical;
                 currentVertexIndex++;
             }
-            horizontalPos += spacePerHorizontal;
             forwardPos += spacePerForward;
+
+            if (rightSide) {
+                horizontalPos -= spacePerHorizontal;
+            } else {
+                horizontalPos += spacePerHorizontal;
+            }
         }
     }
 
