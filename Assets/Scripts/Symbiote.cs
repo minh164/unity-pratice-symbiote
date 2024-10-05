@@ -11,6 +11,8 @@ public class Symbiote : MonoBehaviour
     public float x;
     public float y;
     public float z;
+    public int horizontalVertexNumber = 1; // From negative number to postive number of vertex range on horizontal.
+    public int verticalVertexNumber = 1; // From negative number to postive number of vertex range on vertical.
     public bool freezePos = false;
 
     [SerializeField]
@@ -31,9 +33,6 @@ public class Symbiote : MonoBehaviour
     private Dictionary<int, int> cells = new Dictionary<int, int>{}; // Each cell includes index is vertex index and value is bone index.
     private SkinnedMeshRenderer rend;
     private Mesh mesh;
-    private int horizontalVertexNumber = 2; // From negative number to postive number of vertex range on horizontal.
-    private int verticalVertexNumber = 2; // From negative number to postive number of vertex range on vertical.
-
     private GameObject centerBone;
     private SymBone symBone;
     private SymVertex symVertex;
@@ -168,8 +167,9 @@ public class Symbiote : MonoBehaviour
 
     private void GenerateCross(bool rightSide = false)
     {
-        // A Squad is separated by two triangles and 
-        // has one middle cross and two half parts of crosses (half ones on each triangle).
+        // Crosses in a Squad are separated by:
+        // - One middle cross.
+        // - And two half cross parts in two Right Triangles.
         int totalCrosses = (horizontalVertexNumber * 2 + 1) + (verticalVertexNumber * 2 + 1) - 3;
         int halfCrosses = (totalCrosses - 1) / 2;
 
@@ -180,24 +180,24 @@ public class Symbiote : MonoBehaviour
         float spacePerVertical = z / (verticalVertexNumber * 2);
         float verticalPos = 0;
         float horizontalPos = 0;
-        int horizontalVertexTotal = 1;
+        int crossVertexTotal = 1;
 
-        // Process Right Triagle on top.
+        // Process Crosses in Right Triagle on top.
         horizontalPos = (x / 2) * -1 * side;
         verticalPos = z / 2;
         for (int i = 1; i <= halfCrosses; i++) {
-            horizontalVertexTotal += 1;
+            crossVertexTotal += 1;
             verticalPos -= spacePerVertical;
 
             GenerateCrossSquad();
         }
 
-        // Process Right Triagle on bottom.
+        // Process Crosses in Right Triagle on bottom.
         horizontalPos = (x / 2) * side;
         verticalPos = (z / 2) * -1;
-        horizontalVertexTotal = 1;
+        crossVertexTotal = 1;
         for (int i = 1; i <= halfCrosses; i++) {
-            horizontalVertexTotal += 1;
+            crossVertexTotal += 1;
 
             if (rightSide) {
                 horizontalPos += spacePerHorizontal;
@@ -207,6 +207,21 @@ public class Symbiote : MonoBehaviour
 
             GenerateCrossSquad();
         }
+
+        // Process Middle cross.
+        int crossVertexHalf = Math.Min(horizontalVertexNumber, verticalVertexNumber);
+        crossVertexTotal = (crossVertexHalf * 2) + 1;
+        horizontalPos = 0; // Start from center.
+        verticalPos = 0; // Start from center.
+        for (int i = 1; i <= crossVertexHalf; i++) {
+            verticalPos -= spacePerVertical;
+            if (rightSide) {
+                horizontalPos += spacePerHorizontal;
+            } else {
+                horizontalPos -= spacePerHorizontal;
+            }
+        }
+        GenerateCrossSquad();
 
         void GenerateCrossSquad()
         {
@@ -218,12 +233,12 @@ public class Symbiote : MonoBehaviour
                 x / (horizontalVertexNumber * 2),
                 y / (verticalVertexNumber * 2),
                 z / (verticalVertexNumber * 2),
-                horizontalVertexTotal,
+                crossVertexTotal,
                 verticalVertexNumber * 2 + 1,
                 rightSide
             );
             CreateSquadTriangles(
-                horizontalVertexTotal,
+                crossVertexTotal,
                 verticalVertexNumber * 2 + 1,
                 rightSide
             );
