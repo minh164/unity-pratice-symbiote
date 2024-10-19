@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Symbiote : MonoBehaviour
 {
@@ -14,11 +15,11 @@ public class Symbiote : MonoBehaviour
     public int horizontalVertexNumber = 1; // From negative number to postive number of vertex range on horizontal.
     public int verticalVertexNumber = 1; // From negative number to postive number of vertex range on vertical.
     public bool freezePos = false;
+    public bool spherize = false;
+    public bool isSphereCollider = false;
 
     [SerializeField]
     private bool onGizmo = false;
-    [SerializeField]
-    private bool spherize = false;
     [SerializeField]
     private float colliderSize = 0.2f;
     [SerializeField]
@@ -41,22 +42,13 @@ public class Symbiote : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        gameObject.AddComponent<SkinnedMeshRenderer>();
-        rend = gameObject.GetComponent<SkinnedMeshRenderer>();
-        mesh = new Mesh();
-        GameObject[] bones = new GameObject[]{};
-
-        symBone = new SymBone(this, bones, rend, mesh);
-        symVertex = new SymVertex(mesh);
-        symDebug = new SymDebug();
-
-        CreateCube();
+        Born();
     }
 
     // Update is called once per frame
     void Update()
     {
-        UpdateCellPositions();
+        // UpdateCellPositions(); // TODO: need to investigate.
     }
 
     void OnDrawGizmos()
@@ -78,6 +70,20 @@ public class Symbiote : MonoBehaviour
         // Debug.Log("p--" + transform.position);
         // Debug.Log("c--" + centerBone.transform.position);
         // Debug.Log("---------------------------------------");
+    }
+
+    private void Born()
+    {
+        gameObject.AddComponent<SkinnedMeshRenderer>();
+        rend = gameObject.GetComponent<SkinnedMeshRenderer>();
+        mesh = new Mesh();
+        GameObject[] bones = new GameObject[]{};
+
+        symBone = new SymBone(this, bones, rend, mesh);
+        symVertex = new SymVertex(mesh);
+        symDebug = new SymDebug();
+
+        CreateCube();
     }
 
     private void CreateCube()

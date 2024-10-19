@@ -124,9 +124,7 @@ public class SymBone
         }
 
         // Add collider.
-        bone.AddComponent<SphereCollider>();
-        SphereCollider collider = bone.GetComponent<SphereCollider>();
-        collider.radius = colliderSize;
+        AddCollider(bone, colliderSize);
 
         // Add movements for each bone.
         bone.AddComponent<Movement>();
@@ -235,6 +233,19 @@ public class SymBone
 
             _bones[i] = bone;
             _rend.bones[i] = bone.transform;
+        }
+    }
+
+    private void AddCollider(GameObject bone, float colliderSize)
+    {
+        if (_symbiote.isSphereCollider) {
+            bone.AddComponent<SphereCollider>();
+            SphereCollider collider = bone.GetComponent<SphereCollider>();
+            collider.radius = colliderSize;
+        } else {
+            bone.AddComponent<BoxCollider>();
+            BoxCollider collider = bone.GetComponent<BoxCollider>();
+            collider.size = new Vector3(colliderSize, colliderSize, colliderSize);
         }
     }
 }
