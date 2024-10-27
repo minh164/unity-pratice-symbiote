@@ -30,6 +30,8 @@ public class Symbiote : MonoBehaviour
     private bool enableCollision = true;
     [SerializeField]
     private float damper = 2;
+    [SerializeField]
+    private bool isUpdateWhenOffscreen = false;
     
     private Dictionary<int, int> cells = new Dictionary<int, int>{}; // Each cell includes index is vertex index and value is bone index.
     private SkinnedMeshRenderer rend;
@@ -110,13 +112,8 @@ public class Symbiote : MonoBehaviour
 
         mesh.RecalculateNormals();
 
-        // Connect center to parent.
-        // CreateJoint(centerBone, gameObject);
-
-        // Connect bones to center bone.
-        // for (int i = 1; i < bones.Length; i++) {
-        //     CreateJoint(bones[i], centerBone);
-        // }
+        // Recalculate bounds of Renderer every frame.
+        rend.updateWhenOffscreen = isUpdateWhenOffscreen;
 
         // Add Bones and Mesh into Renderer.
         rend.sharedMesh = mesh;
