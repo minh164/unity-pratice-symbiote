@@ -126,9 +126,6 @@ public class SymBone
         // Add collider.
         AddCollider(bone, colliderSize);
 
-        // Add movements for each bone.
-        bone.AddComponent<Movement>();
-
         GameObject[] boneList = new GameObject[] {
             bone
         };
