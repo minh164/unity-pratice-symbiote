@@ -30,9 +30,9 @@ public class Symbiote : MonoBehaviour
     [SerializeField]
     private bool isUpdateWhenOffscreen = false;
     
-    private float x = 1;
-    private float y = 1;
-    private float z = 1;
+    public float x {get { return 1;}}
+    public float y {get { return 1;}}
+    public float z {get { return 1;}}
     private Dictionary<int, int> cells = new Dictionary<int, int>{}; // Each cell includes index is vertex index and value is bone index.
     private SkinnedMeshRenderer rend;
     private Mesh mesh;
@@ -40,6 +40,7 @@ public class Symbiote : MonoBehaviour
     private SymBone symBone;
     private SymVertex symVertex;
     private SymDebug symDebug;
+    private SymJoint symJoint;
 
     // Start is called before the first frame update
     void Start()
@@ -84,6 +85,7 @@ public class Symbiote : MonoBehaviour
         symBone = new SymBone(this, bones, rend, mesh);
         symVertex = new SymVertex(mesh);
         symDebug = new SymDebug();
+        symJoint = new SymJoint();
 
         CreateCube();
     }
@@ -109,6 +111,9 @@ public class Symbiote : MonoBehaviour
             symBone.SpherizeBones();
             symVertex.SpherizeVectors();
         }
+
+        // Add collider for all bones.
+        symBone.AddColliderForBones(colliderSize);
 
         mesh.RecalculateNormals();
 
@@ -399,29 +404,35 @@ public class Symbiote : MonoBehaviour
                 triangles[currentTriangleIndex++] = bVertex;
 
                 // Connect bones together.
-                CreateJoint(
+                symJoint.CreateJoint(
                     symBone.GetBoneByPosition(symVertex.GetVertexByIndex(aVertex)),
-                    symBone.GetBoneByPosition(symVertex.GetVertexByIndex(bVertex))
-                );
-                CreateJoint(
                     symBone.GetBoneByPosition(symVertex.GetVertexByIndex(bVertex)),
-                    symBone.GetBoneByPosition(symVertex.GetVertexByIndex(cVertex))
+                    spring, damper, autoAnchor, enableCollision
                 );
-                CreateJoint(
+                symJoint.CreateJoint(
+                    symBone.GetBoneByPosition(symVertex.GetVertexByIndex(bVertex)),
                     symBone.GetBoneByPosition(symVertex.GetVertexByIndex(cVertex)),
-                    symBone.GetBoneByPosition(symVertex.GetVertexByIndex(aVertex))
+                    spring, damper, autoAnchor, enableCollision
                 );
-                CreateJoint(
+                symJoint.CreateJoint(
+                    symBone.GetBoneByPosition(symVertex.GetVertexByIndex(cVertex)),
                     symBone.GetBoneByPosition(symVertex.GetVertexByIndex(aVertex)),
-                    symBone.GetBoneByPosition(symVertex.GetVertexByIndex(dVertex))
+                    spring, damper, autoAnchor, enableCollision
                 );
-                CreateJoint(
+                symJoint.CreateJoint(
+                    symBone.GetBoneByPosition(symVertex.GetVertexByIndex(aVertex)),
                     symBone.GetBoneByPosition(symVertex.GetVertexByIndex(dVertex)),
-                    symBone.GetBoneByPosition(symVertex.GetVertexByIndex(bVertex))
+                    spring, damper, autoAnchor, enableCollision
                 );
-                CreateJoint(
+                symJoint.CreateJoint(
+                    symBone.GetBoneByPosition(symVertex.GetVertexByIndex(dVertex)),
+                    symBone.GetBoneByPosition(symVertex.GetVertexByIndex(bVertex)),
+                    spring, damper, autoAnchor, enableCollision
+                );
+                symJoint.CreateJoint(
                     symBone.GetBoneByPosition(symVertex.GetVertexByIndex(cVertex)),
-                    symBone.GetBoneByPosition(symVertex.GetVertexByIndex(dVertex))
+                    symBone.GetBoneByPosition(symVertex.GetVertexByIndex(dVertex)),
+                    spring, damper, autoAnchor, enableCollision
                 );
             }
         }
@@ -431,39 +442,5 @@ public class Symbiote : MonoBehaviour
         }
 
         mesh.triangles = mesh.triangles.Concat(triangles).ToArray();
-    }
-
-    private void CreateJoint(GameObject bone, GameObject connectedBone)
-    {
-        // If Current Bone has connected with Connected Bone OR reverse, it will not do again.
-        if (IsExistedJoint(bone, connectedBone) || IsExistedJoint(connectedBone, bone)) {
-            return;
-        }
-        
-        bone.AddComponent<SpringJoint>();
-        SpringJoint[] joints = bone.GetComponents<SpringJoint>();
-        SpringJoint newJoint = joints[joints.Length - 1];
-        newJoint.connectedBody = connectedBone.GetComponent<Rigidbody>();
-        newJoint.autoConfigureConnectedAnchor = autoAnchor;
-        newJoint.spring = spring;
-        newJoint.enableCollision = enableCollision;
-        newJoint.damper = damper;
-
-        // Debug.DrawLine(bone.transform.position, connectedBone.transform.position);
-        // Debug.Log(bone.transform.position);
-        // Debug.Log(connectedBone.transform.position);
-        // Debug.Log("------");
-    }
-
-    private bool IsExistedJoint(GameObject bone, GameObject connectedBone)
-    {
-        SpringJoint[] joints = bone.GetComponents<SpringJoint>();
-        foreach (SpringJoint joint in joints) {
-            if (joint.connectedBody.GetInstanceID() == connectedBone.GetComponent<Rigidbody>().GetInstanceID()) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

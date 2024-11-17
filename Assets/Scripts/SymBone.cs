@@ -105,6 +105,10 @@ public class SymBone
         Matrix4x4[] bindposes = new Matrix4x4[1];
 
         GameObject bone = new GameObject(name);
+
+        // Set bone's scale equals parent's scale.
+        bone.transform.localScale = _symbiote.transform.localScale;
+        
         tranBones[0] = bone.transform;
         tranBones[0].parent = _symbiote.transform;
         // Set the position relative to the parent
@@ -124,7 +128,7 @@ public class SymBone
         }
 
         // Add collider.
-        AddCollider(bone, colliderSize);
+        // AddCollider(bone, colliderSize);
 
         GameObject[] boneList = new GameObject[] {
             bone
@@ -234,15 +238,28 @@ public class SymBone
     }
 
     private void AddCollider(GameObject bone, float colliderSize)
-    {
+    {        
         if (_symbiote.isSphereCollider) {
             bone.AddComponent<SphereCollider>();
             SphereCollider collider = bone.GetComponent<SphereCollider>();
             collider.radius = colliderSize;
+            collider.transform.localScale = bone.transform.localScale;
         } else {
             bone.AddComponent<BoxCollider>();
             BoxCollider collider = bone.GetComponent<BoxCollider>();
             collider.size = new Vector3(colliderSize, colliderSize, colliderSize);
+            collider.transform.localScale = bone.transform.localScale;
+        }
+    }
+
+    public void AddColliderForBones(float colliderSize)
+    {
+        // TODO
+        // float volume = _symbiote.x * _symbiote.y * _symbiote.z;
+        // colliderSize = volume / _bones.Length;
+
+        foreach (GameObject bone in _bones) {
+            AddCollider(bone, colliderSize);
         }
     }
 }
