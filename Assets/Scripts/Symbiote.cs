@@ -9,9 +9,6 @@ using UnityEngine.UI;
 public class Symbiote : MonoBehaviour
 {
     public Material mat;
-    public float x;
-    public float y;
-    public float z;
     public int horizontalVertexNumber = 1; // From negative number to postive number of vertex range on horizontal.
     public int verticalVertexNumber = 1; // From negative number to postive number of vertex range on vertical.
     public bool freezePos = false;
@@ -33,6 +30,9 @@ public class Symbiote : MonoBehaviour
     [SerializeField]
     private bool isUpdateWhenOffscreen = false;
     
+    private float x = 1;
+    private float y = 1;
+    private float z = 1;
     private Dictionary<int, int> cells = new Dictionary<int, int>{}; // Each cell includes index is vertex index and value is bone index.
     private SkinnedMeshRenderer rend;
     private Mesh mesh;
