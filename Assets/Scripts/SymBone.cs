@@ -254,9 +254,17 @@ public class SymBone
 
     public void AddColliderForBones(float colliderSize)
     {
-        // TODO
-        // float volume = _symbiote.x * _symbiote.y * _symbiote.z;
-        // colliderSize = volume / _bones.Length;
+        // TODO: it's just for Cube, calculation for Sphere later.
+
+        // Calculate volume total of Parent.
+        float volumeOfParent = _symbiote.x * _symbiote.y * _symbiote.z;
+
+        // Calculate volume each bone (we forced scale number of bone is the same parent).
+        float volumeEachBone  = volumeOfParent / _bones.Length;
+
+        // Calculate each vector's magnitude of a collider.
+        double colliderSizeDouble = Math.Cbrt((double) volumeEachBone);
+        colliderSize = (float) colliderSizeDouble;
 
         foreach (GameObject bone in _bones) {
             AddCollider(bone, colliderSize);
