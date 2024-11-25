@@ -100,7 +100,7 @@ public class SymDebug
                 mesh.vertices[i].z
             );
             Gizmos.color = new Color(1, 0, 0, 1);
-            Gizmos.DrawCube(vertexPos, new Vector3(size, size, size));
+            Gizmos.DrawCube(mesh.vertices[i], new Vector3(size, size, size));
             // Debug.Log("vector: " + mesh.vertices[i]);
 
             if (i < rend.bones.Length) {
@@ -141,5 +141,17 @@ public class SymDebug
         Debug.Log(hypotenuse);
 
         return hypotenuse;
+    }
+
+    public void DebugCells(Dictionary<int, int> cells, SymBone symBone, SymVertex symVertex)
+    {
+        foreach (var cell in cells) {
+            GameObject bone = symBone.GetBoneByIndex(cell.Value);
+            Vector3 vertex = symVertex.GetVertexByIndex(cell.Key);
+
+            Debug.Log("----" + cell.Key);
+            Debug.Log("b :" + bone.transform.localPosition);
+            Debug.Log("v :" + vertex);
+        }
     }
 }
