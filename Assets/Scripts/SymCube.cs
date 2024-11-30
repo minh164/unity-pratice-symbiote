@@ -33,7 +33,7 @@ public class SymCube : Symbiote
         AddColliderForBones(colliderSize);
     }
 
-    protected virtual void GenerateSide(string side)
+    protected void GenerateSide(string side, bool onlyOutsideSquads = false)
     {
         float forward = 0, width = 0, height = 0;
         int vertexNumber = 0;
@@ -66,6 +66,16 @@ public class SymCube : Symbiote
         float forwardPos = forward / 2 * -1;
         int forwardStart = vertexNumber * -1;
         for (int i = forwardStart; i <= vertexNumber; i++) {
+            // Only generate outside squads (exclude inside ones).
+            if (
+                onlyOutsideSquads
+                && i != forwardStart 
+                && i != vertexNumber 
+            ) {
+                forwardPos += spacePerForward;
+                continue;
+            }
+
             GenerateSquadCells(width, height, forwardPos, side);
             CreateSquadTriangles(
                 horizontalVertexNumber * 2 + 1,
@@ -76,7 +86,7 @@ public class SymCube : Symbiote
         }
     }
 
-    protected virtual void GenerateCross(bool rightSide = false)
+    protected void GenerateCross(bool rightSide = false)
     {
         // Crosses in a Squad are separated by:
         // - One middle cross.

@@ -18,20 +18,18 @@ public class SymSphere : SymCube
 
     protected override void Create()
     {
-        base.Create();
+        // Add Center bone.
+        centerBone = GenerateCell(Vector3.zero, "0");
 
-        // if (spherize) {
-        //     symBone.SpherizeBones();
-        //     symVertex.SpherizeVectors();
-        // }
-    }
+        GenerateSide("front", true);
+        GenerateSide("right", true);
+        GenerateSide("top", true);
+    
+        symBone.SpherizeBones();
+        symVertex.SpherizeVectors();
 
-    protected override void GenerateSide(string side)
-    {
-    }
-
-    protected override void GenerateCross(bool rightSide = false)
-    {
+        // Add collider for all bones.
+        AddColliderForBones(colliderSize);
     }
 
     protected override void AddColliderForBones(float colliderSize)
