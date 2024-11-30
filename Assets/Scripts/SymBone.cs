@@ -23,6 +23,11 @@ public class SymBone
         _mesh = mesh;
     }
 
+    public GameObject[] GetBones()
+    {
+        return _bones;
+    }
+
     /// <summary>
     /// 
     /// </summary>
@@ -234,40 +239,6 @@ public class SymBone
 
             _bones[i] = bone;
             _rend.bones[i] = bone.transform;
-        }
-    }
-
-    private void AddCollider(GameObject bone, float colliderSize)
-    {        
-        if (_symbiote.isSphereCollider) {
-            bone.AddComponent<SphereCollider>();
-            SphereCollider collider = bone.GetComponent<SphereCollider>();
-            collider.radius = colliderSize;
-            collider.transform.localScale = bone.transform.localScale;
-        } else {
-            bone.AddComponent<BoxCollider>();
-            BoxCollider collider = bone.GetComponent<BoxCollider>();
-            collider.size = new Vector3(colliderSize, colliderSize, colliderSize);
-            collider.transform.localScale = bone.transform.localScale;
-        }
-    }
-
-    public void AddColliderForBones(float colliderSize)
-    {
-        // TODO: it's just for Cube, calculation for Sphere later.
-
-        // Calculate volume total of Parent.
-        float volumeOfParent = _symbiote.x * _symbiote.y * _symbiote.z;
-
-        // Calculate volume each bone (we forced scale number of bone is the same parent).
-        float volumeEachBone  = volumeOfParent / _bones.Length;
-
-        // Calculate each vector's magnitude of a collider.
-        double colliderSizeDouble = Math.Cbrt((double) volumeEachBone);
-        colliderSize = (float) colliderSizeDouble;
-
-        foreach (GameObject bone in _bones) {
-            AddCollider(bone, colliderSize);
         }
     }
 }

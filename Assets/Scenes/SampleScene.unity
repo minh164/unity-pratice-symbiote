@@ -123,6 +123,34 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &220632570 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1735902869537880906, guid: 0aef1c2a035504c959b3f502d17ebdd4, type: 3}
+  m_PrefabInstance: {fileID: 4017538241986115846}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &220632576
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 220632570}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef64b245d474a4dbb8a3efb7fd953f05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mat: {fileID: 2100000, guid: 82feb17f937cf440daf82ea0d3b0107a, type: 2}
+  horizontalVertexNumber: 1
+  verticalVertexNumber: 1
+  freezePos: 0
+  onGizmo: 0
+  colliderSize: 0.2
+  spring: 40
+  autoAnchor: 0
+  enableCollision: 1
+  damper: 2
+  isUpdateWhenOffscreen: 1
 --- !u!1 &359508279
 GameObject:
   m_ObjectHideFlags: 0
@@ -545,6 +573,7 @@ GameObject:
   - component: {fileID: 963194228}
   - component: {fileID: 963194227}
   - component: {fileID: 963194226}
+  - component: {fileID: 963194229}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -626,6 +655,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 29.554, y: -9.631, z: -1.511}
+--- !u!114 &963194229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 963194225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 476d6c1e1a2f34094919f9055344370c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 220632570}
+  distance: {x: 0, y: 0, z: 0}
 --- !u!1 &1121777628
 GameObject:
   m_ObjectHideFlags: 0
@@ -997,6 +1040,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1202505446213299402, guid: 0aef1c2a035504c959b3f502d17ebdd4, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1735902869537880906, guid: 0aef1c2a035504c959b3f502d17ebdd4, type: 3}
       propertyPath: m_Name
       value: Symbiote
@@ -1019,7 +1066,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3466792216941072581, guid: 0aef1c2a035504c959b3f502d17ebdd4, type: 3}
       propertyPath: spring
-      value: 10
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 3466792216941072581, guid: 0aef1c2a035504c959b3f502d17ebdd4, type: 3}
+      propertyPath: onGizmo
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3466792216941072581, guid: 0aef1c2a035504c959b3f502d17ebdd4, type: 3}
+      propertyPath: spherize
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3466792216941072581, guid: 0aef1c2a035504c959b3f502d17ebdd4, type: 3}
+      propertyPath: freezePos
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3466792216941072581, guid: 0aef1c2a035504c959b3f502d17ebdd4, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3466792216941072581, guid: 0aef1c2a035504c959b3f502d17ebdd4, type: 3}
       propertyPath: autoAnchor
@@ -1027,7 +1090,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3466792216941072581, guid: 0aef1c2a035504c959b3f502d17ebdd4, type: 3}
       propertyPath: colliderSize
-      value: 0.3
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 3466792216941072581, guid: 0aef1c2a035504c959b3f502d17ebdd4, type: 3}
       propertyPath: enableCollision
@@ -1039,7 +1102,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3466792216941072581, guid: 0aef1c2a035504c959b3f502d17ebdd4, type: 3}
       propertyPath: verticalVertexNumber
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 3466792216941072581, guid: 0aef1c2a035504c959b3f502d17ebdd4, type: 3}
       propertyPath: isUpdateWhenOffscreen
@@ -1047,7 +1110,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3466792216941072581, guid: 0aef1c2a035504c959b3f502d17ebdd4, type: 3}
       propertyPath: horizontalVertexNumber
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 5859363164826196452, guid: 0aef1c2a035504c959b3f502d17ebdd4, type: 3}
       propertyPath: m_LocalScale.x
@@ -1071,7 +1134,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5859363164826196452, guid: 0aef1c2a035504c959b3f502d17ebdd4, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -1.91
+      value: -2.364
       objectReference: {fileID: 0}
     - target: {fileID: 5859363164826196452, guid: 0aef1c2a035504c959b3f502d17ebdd4, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1104,9 +1167,13 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 1389959576068866250, guid: 0aef1c2a035504c959b3f502d17ebdd4, type: 3}
     - {fileID: 2073481794336567473, guid: 0aef1c2a035504c959b3f502d17ebdd4, type: 3}
+    - {fileID: 3466792216941072581, guid: 0aef1c2a035504c959b3f502d17ebdd4, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1735902869537880906, guid: 0aef1c2a035504c959b3f502d17ebdd4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 220632576}
   m_SourcePrefab: {fileID: 100100000, guid: 0aef1c2a035504c959b3f502d17ebdd4, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
