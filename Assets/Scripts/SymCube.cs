@@ -326,7 +326,7 @@ public class SymCube : Symbiote
     protected virtual void AddColliderForBones(float colliderSize)
     {
         // Calculate volume total of Parent.
-        float volumeOfParent = x * y * z;
+        float volumeOfParent = GetVolume();
 
         // Calculate volume each bone (we forced scale number of bone is the same parent).
         float volumeEachBone  = volumeOfParent / symBone.CountBones();
@@ -338,5 +338,10 @@ public class SymCube : Symbiote
         foreach (GameObject bone in symBone.GetBones()) {
             AddCollider(bone, colliderSize);
         }
+    }
+
+    public virtual float GetVolume()
+    {
+        return x * y * z;
     }
 }

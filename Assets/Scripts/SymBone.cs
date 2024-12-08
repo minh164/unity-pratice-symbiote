@@ -230,12 +230,17 @@ public class SymBone
         _mesh.boneWeights = cloneWeights;
     }
 
-    public void SpherizeBones()
+    public void SpherizeBones(float radius)
     {
         for(int i = 0; i<_bones.Length; i++)
         {
             GameObject bone = _bones[i];
-            bone.transform.localPosition = bone.transform.localPosition.normalized;
+            Vector3 normalize = bone.transform.localPosition.normalized;
+            bone.transform.localPosition = new Vector3(
+                normalize.x * radius,
+                normalize.y * radius,
+                normalize.z * radius
+            );
 
             _bones[i] = bone;
             _rend.bones[i] = bone.transform;

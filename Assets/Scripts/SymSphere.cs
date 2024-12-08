@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,12 +9,13 @@ public class SymSphere : SymCube
     protected override void Start()
     {
         base.Start();
+        // Debug.Log(Vector3.Distance(centerBone.transform.localPosition, symBone.GetBoneByIndex(10).transform.localPosition));
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        symDebug.DrawBoneConnections(symBone.GetBones());
     }
 
     protected override void Create()
@@ -25,9 +27,8 @@ public class SymSphere : SymCube
         GenerateSide("right", true);
         GenerateSide("top", true);
     
-        symBone.SpherizeBones();
-        symVertex.SpherizeVectors();
-
+        Spherize();
+        
         // Add collider for all bones.
         AddColliderForBones(colliderSize);
     }
@@ -37,5 +38,26 @@ public class SymSphere : SymCube
         foreach (GameObject bone in symBone.GetBones()) {
             AddCollider(bone, colliderSize, "sphere");
         }
+    }
+
+    public float GetRadius()
+    {
+        double volume = (double) GetVolume();
+        double exponent = 1 / 3d;
+
+        double doubleValue = Math.Pow(
+            3 * volume / (4 * Math.PI),
+            exponent
+        );
+
+        return (float) doubleValue;
+    }
+
+    private void Spherize()
+    {
+        float radius = GetRadius();
+
+        symBone.SpherizeBones(radius);
+        symVertex.SpherizeVectors(radius);
     }
 }

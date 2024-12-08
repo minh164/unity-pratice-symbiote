@@ -151,7 +151,19 @@ public class SymDebug
 
             Debug.Log("----" + cell.Key);
             Debug.Log("b :" + bone.transform.localPosition);
-            Debug.Log("v :" + vertex);
+            // Debug.Log("v :" + vertex);
+            // Debug.Log("b : " + bone.transform.localPosition.magnitude);
+        }
+    }
+
+    public void DrawBoneConnections(GameObject[] bones)
+    {
+        foreach (GameObject bone in bones) {
+            SpringJoint[] joints = bone.GetComponents<SpringJoint>();
+            Vector3 bonePos = bone.transform.position;
+            foreach (SpringJoint joint in joints) {
+                Debug.DrawLine(bonePos, joint.connectedBody.position, Color.red);
+            }
         }
     }
 }

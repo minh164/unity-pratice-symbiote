@@ -55,7 +55,7 @@ public class SymVertex
         return vertexIndex;
     }
 
-    public void SpherizeVectors()
+    public void SpherizeVectors(float radius)
     {
         Vector3[] vectors = new Vector3[] {};
         for(int i = 0; i<_mesh.vertices.Length; i++)
@@ -64,7 +64,13 @@ public class SymVertex
             // Vector3 sphereVector = vector.normalized * (size/2)*1.67f;
             // Vector3 lerpdVector = Vector3.Lerp(vector,sphereVector,morphValue);
             // vectors[i] = origin+lerpdVector;
-            Vector3[] addVector = new Vector3[1] {_mesh.vertices[i].normalized};
+            Vector3 normalize = _mesh.vertices[i].normalized;
+            
+            Vector3[] addVector = new Vector3[1] {new Vector3(
+                normalize.x * radius,
+                normalize.y * radius,
+                normalize.z * radius
+            )};
             vectors = vectors.Concat(addVector).ToArray();
         }
 
