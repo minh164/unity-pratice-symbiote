@@ -39,8 +39,19 @@ public class SymSphere : SymCube
         return base.GenerateCell(position, name);
     }
 
-    protected override void AddColliderForBones(float colliderSize)
+    protected override void AddColliderForBones(float colliderSize = 0)
     {
+        if (colliderSize <= 0) {
+            // Calculate volume total of Parent.
+            float volumeOfParent = GetVolume();
+
+            // Calculate volume each bone (we forced scale number of bone is the same parent).
+            float volumeEachBone = volumeOfParent / symBone.CountBones();
+
+            // Calculate each vector's magnitude of a collider.
+            colliderSize = FindRadiusByVolume(volumeEachBone);
+        }
+
         foreach (GameObject bone in symBone.GetBones()) {
             AddCollider(bone, colliderSize, "sphere");
         }
@@ -48,11 +59,16 @@ public class SymSphere : SymCube
 
     public float GetRadius()
     {
-        double volume = (double) GetVolume();
+        return FindRadiusByVolume(GetVolume());
+    }
+
+    private float FindRadiusByVolume(float volume)
+    {
+        double doubleVolume = (double) volume;
         double exponent = 1 / 3d;
 
         double doubleValue = Math.Pow(
-            3 * volume / (4 * Math.PI),
+            3 * doubleVolume / (4 * Math.PI),
             exponent
         );
 

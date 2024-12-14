@@ -323,17 +323,19 @@ public class SymCube : Symbiote
         mesh.triangles = mesh.triangles.Concat(triangles).ToArray();
     }
 
-    protected virtual void AddColliderForBones(float colliderSize)
+    protected virtual void AddColliderForBones(float colliderSize = 0)
     {
-        // Calculate volume total of Parent.
-        float volumeOfParent = GetVolume();
+        if (colliderSize <= 0) {
+            // Calculate volume total of Parent.
+            float volumeOfParent = GetVolume();
 
-        // Calculate volume each bone (we forced scale number of bone is the same parent).
-        float volumeEachBone  = volumeOfParent / symBone.CountBones();
+            // Calculate volume each bone (we forced scale number of bone is the same parent).
+            float volumeEachBone  = volumeOfParent / symBone.CountBones();
 
-        // Calculate each vector's magnitude of a collider.
-        double colliderSizeDouble = Math.Cbrt((double) volumeEachBone);
-        colliderSize = (float) colliderSizeDouble;
+            // Calculate each vector's magnitude of a collider.
+            double colliderSizeDouble = Math.Cbrt((double) volumeEachBone);
+            colliderSize = (float) colliderSizeDouble;
+        }
 
         foreach (GameObject bone in symBone.GetBones()) {
             AddCollider(bone, colliderSize);
