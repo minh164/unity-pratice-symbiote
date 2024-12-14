@@ -108,7 +108,7 @@ public class Symbiote : MonoBehaviour
     {
     }
 
-    protected GameObject GenerateCell(Vector3 position, string name)
+    protected virtual GameObject GenerateCell(Vector3 position, string name)
     {
         Vector3 vertex = symVertex.CreateVertex(position);
 

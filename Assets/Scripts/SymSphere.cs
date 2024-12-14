@@ -27,10 +27,16 @@ public class SymSphere : SymCube
         GenerateSide("right", true);
         GenerateSide("top", true);
     
-        Spherize();
-        
         // Add collider for all bones.
         AddColliderForBones(colliderSize);
+    }
+
+    protected override GameObject GenerateCell(Vector3 position, string name)
+    {
+        // Spherize position of vertex and bone in initialization.
+        position = SpherizePosition(position);
+
+        return base.GenerateCell(position, name);
     }
 
     protected override void AddColliderForBones(float colliderSize)
@@ -53,11 +59,15 @@ public class SymSphere : SymCube
         return (float) doubleValue;
     }
 
-    private void Spherize()
+    private Vector3 SpherizePosition(Vector3 position)
     {
         float radius = GetRadius();
+        Vector3 normalize = position.normalized;
 
-        symBone.SpherizeBones(radius);
-        symVertex.SpherizeVectors(radius);
+        return new Vector3(
+            normalize.x * radius,
+            normalize.y * radius,
+            normalize.z * radius
+        );
     }
 }

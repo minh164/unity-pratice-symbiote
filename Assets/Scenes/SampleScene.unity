@@ -486,8 +486,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mat: {fileID: 2100000, guid: 82feb17f937cf440daf82ea0d3b0107a, type: 2}
-  horizontalVertexNumber: 1
-  verticalVertexNumber: 1
+  horizontalVertexNumber: 3
+  verticalVertexNumber: 3
   freezePos: 0
   onGizmo: 0
   colliderSize: 0.05
@@ -991,7 +991,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1202505446213299402, guid: 0aef1c2a035504c959b3f502d17ebdd4, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1735902869537880906, guid: 0aef1c2a035504c959b3f502d17ebdd4, type: 3}
       propertyPath: m_Name
