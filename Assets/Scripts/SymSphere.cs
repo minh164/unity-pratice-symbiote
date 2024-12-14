@@ -26,6 +26,8 @@ public class SymSphere : SymCube
         GenerateSide("front", true);
         GenerateSide("right", true);
         GenerateSide("top", true);
+
+        ConnectWithCenterCell();
     
         // Add collider for all bones.
         AddColliderForBones(colliderSize);
@@ -85,5 +87,22 @@ public class SymSphere : SymCube
             normalize.y * radius,
             normalize.z * radius
         );
+    }
+
+    private void ConnectWithCenterCell()
+    {
+        foreach (var cell in cells) {
+            // Skip cell index is zero, it's Center Cell.
+            if (cell.Key == 0) {
+                continue;
+            }
+
+            GameObject bone = symBone.GetBoneByIndex(cell.Value);
+
+            symJoint.CreateJoint(
+                bone, centerBone,
+                spring, damper, autoAnchor, enableCollision
+            );
+        }
     }
 }
