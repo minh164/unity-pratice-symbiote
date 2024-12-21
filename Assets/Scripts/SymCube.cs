@@ -21,7 +21,7 @@ public class SymCube : Symbiote
     protected override void Create()
     {
         // Add Center bone.
-        centerBone = GenerateCell(Vector3.zero, "0");
+        centerBone = GenerateSideCell(Vector3.zero, "0");
 
         GenerateSide("front");
         GenerateSide("right");
@@ -99,13 +99,11 @@ public class SymCube : Symbiote
 
         float spacePerHorizontal = x / (horizontalVertexNumber * 2);
         float spacePerVertical = z / (verticalVertexNumber * 2);
-        float verticalPos = 0;
-        float horizontalPos = 0;
         int crossVertexTotal = 1;
 
         // Process Crosses in Right Triagle on top.
-        horizontalPos = (x / 2) * -1 * side;
-        verticalPos = z / 2;
+        float horizontalPos = x / 2 * -1 * side;
+        float verticalPos = z / 2;
         for (int i = 1; i <= halfCrosses; i++) {
             crossVertexTotal += 1;
             verticalPos -= spacePerVertical;
@@ -205,7 +203,7 @@ public class SymCube : Symbiote
 
                 // Create bone for vertex.
                 string name = symBone.CountBones().ToString();
-                GenerateCell(position, name);
+                GenerateSideCell(position, name);
 
                 verticalPos += spacePerRow;
                 currentVertexIndex++;
@@ -243,7 +241,7 @@ public class SymCube : Symbiote
 
                 // Create bone for vertex.
                 string name = symBone.CountBones().ToString();
-                GenerateCell(position, name);
+                GenerateCrossCell(position, name);
 
                 verticalPos += spacePerVertical;
                 currentVertexIndex++;

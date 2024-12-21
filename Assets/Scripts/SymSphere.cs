@@ -26,19 +26,21 @@ public class SymSphere : SymCube
         GenerateSide("front", true);
         GenerateSide("right", true);
         GenerateSide("top", true);
+        GenerateCross();
+        GenerateCross(true);
 
-        ConnectWithCenterCell();
+        // ConnectWithCenterCell();
     
         // Add collider for all bones.
         AddColliderForBones(colliderSize);
     }
 
-    protected override GameObject GenerateCell(Vector3 position, string name)
+    protected override GameObject GenerateSideCell(Vector3 position, string name)
     {
         // Spherize position of vertex and bone in initialization.
         position = SpherizePosition(position);
 
-        return base.GenerateCell(position, name);
+        return GenerateCell(position, name);
     }
 
     protected override void AddColliderForBones(float colliderSize = 0)

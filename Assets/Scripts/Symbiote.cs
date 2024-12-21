@@ -108,7 +108,7 @@ public class Symbiote : MonoBehaviour
     {
     }
 
-    protected virtual GameObject GenerateCell(Vector3 position, string name)
+    protected GameObject GenerateCell(Vector3 position, string name)
     {
         Vector3 vertex = symVertex.CreateVertex(position);
 
@@ -127,6 +127,16 @@ public class Symbiote : MonoBehaviour
         cells.Add(vertexIndex, boneIndex);
 
         return symBone.GetLastBone();
+    }
+
+    protected virtual GameObject GenerateSideCell(Vector3 position, string name)
+    {
+        return GenerateCell(position, name);
+    }
+
+    protected virtual GameObject GenerateCrossCell(Vector3 position, string name)
+    {
+        return GenerateCell(position, name);
     }
 
     protected void UpdateCellPositions()
