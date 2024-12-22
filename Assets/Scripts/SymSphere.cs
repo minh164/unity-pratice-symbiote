@@ -9,7 +9,7 @@ public class SymSphere : SymCube
     protected override void Start()
     {
         base.Start();
-        // Debug.Log(Vector3.Distance(centerBone.transform.localPosition, symBone.GetBoneByIndex(10).transform.localPosition));
+        // Debug.Log(Vector3.Distance(centerBone.transform.localPosition, symBone.GetBoneByIndex(15).transform.localPosition));
     }
 
     // Update is called once per frame
@@ -41,6 +41,13 @@ public class SymSphere : SymCube
         position = SpherizePosition(position);
 
         return GenerateCell(position, name);
+    }
+
+    protected override GameObject GenerateCrossCell(Vector3 position, string name)
+    {
+        position = SpherizePosition(position);
+
+        return base.GenerateCrossCell(position, name);
     }
 
     protected override void AddColliderForBones(float colliderSize = 0)

@@ -33,12 +33,12 @@ public class SymCube : Symbiote
         AddColliderForBones(colliderSize);
     }
 
-    protected void GenerateSide(string side, bool onlyOutsideSquads = false)
+    protected void GenerateSide(string side, bool onlyOutsideQuads = false)
     {
         float forward = 0, width = 0, height = 0;
         int vertexNumber = 0;
-        // Determine which first (-1) or last (1) squad will be counter cloclwise.
-        int counterClockwiseSquad = -1;
+        // Determine which first (-1) or last (1) quad will be counter cloclwise.
+        int counterClockwiseQuad = -1;
 
         switch (side) {
             case "front":
@@ -46,7 +46,7 @@ public class SymCube : Symbiote
                 width = x;
                 height = y;
                 vertexNumber = verticalVertexNumber;
-                counterClockwiseSquad = 1;
+                counterClockwiseQuad = 1;
                 break;
             case "right":
                 forward = x;
@@ -66,9 +66,9 @@ public class SymCube : Symbiote
         float forwardPos = forward / 2 * -1;
         int forwardStart = vertexNumber * -1;
         for (int i = forwardStart; i <= vertexNumber; i++) {
-            // Only generate outside squads (exclude inside ones).
+            // Only generate outside quads (exclude inside ones).
             if (
-                onlyOutsideSquads
+                onlyOutsideQuads
                 && i != forwardStart 
                 && i != vertexNumber 
             ) {
@@ -76,11 +76,11 @@ public class SymCube : Symbiote
                 continue;
             }
 
-            GenerateSquadCells(width, height, forwardPos, side);
-            CreateSquadTriangles(
+            GenerateQuadCells(width, height, forwardPos, side);
+            CreateQuadTriangles(
                 horizontalVertexNumber * 2 + 1,
                 verticalVertexNumber * 2 + 1,
-                counterClockwiseSquad < 0 ? i == forwardStart : i == vertexNumber
+                counterClockwiseQuad < 0 ? i == forwardStart : i == vertexNumber
             );
             forwardPos += spacePerForward;
         }
@@ -88,7 +88,7 @@ public class SymCube : Symbiote
 
     protected void GenerateCross(bool rightSide = false)
     {
-        // Crosses in a Squad are separated by:
+        // Crosses in a Quad are separated by:
         // - One middle cross.
         // - And two half cross parts in two Right Triangles.
         int totalCrosses = (horizontalVertexNumber * 2 + 1) + (verticalVertexNumber * 2 + 1) - 3;
@@ -108,7 +108,7 @@ public class SymCube : Symbiote
             crossVertexTotal += 1;
             verticalPos -= spacePerVertical;
 
-            GenerateCrossSquad();
+            GenerateCrossQuad();
         }
 
         // Process Crosses in Right Triagle on bottom.
@@ -124,7 +124,7 @@ public class SymCube : Symbiote
                 horizontalPos -= spacePerHorizontal;
             }
 
-            GenerateCrossSquad();
+            GenerateCrossQuad();
         }
 
         // Process Middle cross.
@@ -140,14 +140,14 @@ public class SymCube : Symbiote
                 horizontalPos -= spacePerHorizontal;
             }
         }
-        GenerateCrossSquad();
+        GenerateCrossQuad();
 
-        void GenerateCrossSquad()
+        void GenerateCrossQuad()
         {
-            // This vertex is start point to generate cross squad.
+            // This vertex is start point to generate cross quad.
             Vector3 vertexStartPosition = new Vector3(horizontalPos, (y / 2) * -1, verticalPos);
 
-            GenerateCrossSquadCells(
+            GenerateCrossQuadCells(
                 vertexStartPosition,
                 x / (horizontalVertexNumber * 2),
                 y / (verticalVertexNumber * 2),
@@ -156,7 +156,7 @@ public class SymCube : Symbiote
                 verticalVertexNumber * 2 + 1,
                 rightSide
             );
-            CreateSquadTriangles(
+            CreateQuadTriangles(
                 crossVertexTotal,
                 verticalVertexNumber * 2 + 1,
                 rightSide
@@ -164,7 +164,7 @@ public class SymCube : Symbiote
         }
     }
 
-    private void GenerateSquadCells(float width, float height, float forwardPos, string side)
+    private void GenerateQuadCells(float width, float height, float forwardPos, string side)
     {
         float spacePerCol = width / (horizontalVertexNumber * 2);
         float spacePerRow = height / (verticalVertexNumber * 2);
@@ -212,7 +212,7 @@ public class SymCube : Symbiote
         }
     }
 
-    private void GenerateCrossSquadCells(
+    private void GenerateCrossQuadCells(
         Vector3 vertexStartPosition,
         float spacePerHorizontal,
         float spacePerVertical,
@@ -256,7 +256,7 @@ public class SymCube : Symbiote
         }
     }
 
-    protected void CreateSquadTriangles(int horizontalVertexTotal, int verticalVertexTotal, bool isCounterClockwise = false)
+    protected void CreateQuadTriangles(int horizontalVertexTotal, int verticalVertexTotal, bool isCounterClockwise = false)
     {
         int cols = horizontalVertexTotal;
         int rows = verticalVertexTotal;

@@ -381,8 +381,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mat: {fileID: 2100000, guid: 82feb17f937cf440daf82ea0d3b0107a, type: 2}
-  horizontalVertexNumber: 2
-  verticalVertexNumber: 2
+  horizontalVertexNumber: 1
+  verticalVertexNumber: 1
   freezePos: 0
   onGizmo: 0
   colliderSize: 0
@@ -409,8 +409,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mat: {fileID: 2100000, guid: 82feb17f937cf440daf82ea0d3b0107a, type: 2}
-  horizontalVertexNumber: 1
-  verticalVertexNumber: 1
+  horizontalVertexNumber: 2
+  verticalVertexNumber: 2
   freezePos: 0
   onGizmo: 0
   colliderSize: 0
