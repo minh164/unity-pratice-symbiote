@@ -38,7 +38,6 @@ public class Symbiote : MonoBehaviour
     protected Dictionary<int, int> cells = new Dictionary<int, int>{}; // Each cell includes index is vertex index and value is bone index.
     protected SkinnedMeshRenderer rend;
     protected Mesh mesh;
-    protected GameObject centerBone;
     protected SymBone symBone;
     protected SymVertex symVertex;
     protected SymDebug symDebug;
@@ -95,12 +94,6 @@ public class Symbiote : MonoBehaviour
 
     void FixedUpdate()
     {
-        // if (Vector3.Distance(transform.position, centerBone.transform.position) > 0.2f) {
-        //     transform.position = centerBone.transform.position;
-        // }
-        // Debug.Log("p--" + transform.position);
-        // Debug.Log("c--" + centerBone.transform.position);
-        // Debug.Log("---------------------------------------");
     }
 
     // Main method to create object.
@@ -108,7 +101,7 @@ public class Symbiote : MonoBehaviour
     {
     }
 
-    protected GameObject GenerateCell(Vector3 position, string name)
+    protected int GenerateCell(Vector3 position, string name)
     {
         Vector3 vertex = symVertex.CreateVertex(position);
 
@@ -126,15 +119,16 @@ public class Symbiote : MonoBehaviour
         int vertexIndex = symVertex.FindVertexIndexByPosition(position);
         cells.Add(vertexIndex, boneIndex);
 
-        return symBone.GetLastBone();
+        // Return cell key.
+        return vertexIndex;
     }
 
-    protected virtual GameObject GenerateSideCell(Vector3 position, string name)
+    protected virtual int GenerateSideCell(Vector3 position, string name)
     {
         return GenerateCell(position, name);
     }
 
-    protected virtual GameObject GenerateCrossCell(Vector3 position, string name)
+    protected virtual int GenerateCrossCell(Vector3 position, string name)
     {
         return GenerateCell(position, name);
     }

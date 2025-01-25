@@ -20,8 +20,8 @@ public class SymCube : Symbiote
 
     protected override void Create()
     {
-        // Add Center bone.
-        centerBone = GenerateSideCell(Vector3.zero, "0");
+        // Add Center Cell.
+        GenerateCell(Vector3.zero, "0");
 
         GenerateSide("front");
         GenerateSide("right");

@@ -381,12 +381,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mat: {fileID: 2100000, guid: 82feb17f937cf440daf82ea0d3b0107a, type: 2}
-  horizontalVertexNumber: 1
-  verticalVertexNumber: 1
+  horizontalVertexNumber: 3
+  verticalVertexNumber: 3
   freezePos: 0
   onGizmo: 0
   colliderSize: 0
-  spring: 40
+  spring: 100
   autoAnchor: 1
   enableCollision: 0
   damper: 0.2

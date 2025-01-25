@@ -9,7 +9,6 @@ public class SymSphere : SymCube
     protected override void Start()
     {
         base.Start();
-        // Debug.Log(Vector3.Distance(centerBone.transform.localPosition, symBone.GetBoneByIndex(15).transform.localPosition));
     }
 
     // Update is called once per frame
@@ -20,8 +19,8 @@ public class SymSphere : SymCube
 
     protected override void Create()
     {
-        // Add Center bone.
-        centerBone = GenerateCell(Vector3.zero, "0");
+        // Add Center Cell.
+        GenerateCell(Vector3.zero, "0");
 
         GenerateSide("front", true);
         GenerateSide("right", true);
@@ -29,13 +28,11 @@ public class SymSphere : SymCube
         GenerateCross();
         GenerateCross(true);
 
-        // ConnectWithCenterCell();
-    
         // Add collider for all bones.
         AddColliderForBones(colliderSize);
     }
 
-    protected override GameObject GenerateSideCell(Vector3 position, string name)
+    protected override int GenerateSideCell(Vector3 position, string name)
     {
         // Spherize position of vertex and bone in initialization.
         position = SpherizePosition(position);
@@ -43,10 +40,8 @@ public class SymSphere : SymCube
         return GenerateCell(position, name);
     }
 
-    protected override GameObject GenerateCrossCell(Vector3 position, string name)
+    protected override int GenerateCrossCell(Vector3 position, string name)
     {
-        position = SpherizePosition(position);
-
         return base.GenerateCrossCell(position, name);
     }
 
@@ -96,22 +91,5 @@ public class SymSphere : SymCube
             normalize.y * radius,
             normalize.z * radius
         );
-    }
-
-    private void ConnectWithCenterCell()
-    {
-        foreach (var cell in cells) {
-            // Skip cell index is zero, it's Center Cell.
-            if (cell.Key == 0) {
-                continue;
-            }
-
-            GameObject bone = symBone.GetBoneByIndex(cell.Value);
-
-            symJoint.CreateJoint(
-                bone, centerBone,
-                spring, damper, autoAnchor, enableCollision
-            );
-        }
     }
 }
