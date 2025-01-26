@@ -65,6 +65,9 @@ public class SymCube : Symbiote
         float spacePerForward = forward / (vertexNumber * 2);
         float forwardPos = forward / 2 * -1;
         int forwardStart = vertexNumber * -1;
+
+        int[][] quadList = new int[vertexNumber * 2 + 1][];
+        int quadIndex = 0;
         for (int i = forwardStart; i <= vertexNumber; i++) {
             // Only generate outside quads (exclude inside ones).
             if (
@@ -76,13 +79,18 @@ public class SymCube : Symbiote
                 continue;
             }
 
-            GenerateQuadCells(width, height, forwardPos, side);
+            quadList[quadIndex] = GenerateQuadCells(width, height, forwardPos, side);
             CreateQuadTriangles(
                 horizontalVertexNumber * 2 + 1,
                 verticalVertexNumber * 2 + 1,
                 counterClockwiseQuad < 0 ? i == forwardStart : i == vertexNumber
             );
             forwardPos += spacePerForward;
+            quadIndex++;
+        }
+
+        if (! onlyOutsideQuads) {
+            SetCellLayers(quadList);
         }
     }
 
@@ -164,12 +172,14 @@ public class SymCube : Symbiote
         }
     }
 
-    private void GenerateQuadCells(float width, float height, float forwardPos, string side)
+    private int[] GenerateQuadCells(float width, float height, float forwardPos, string side)
     {
         float spacePerCol = width / (horizontalVertexNumber * 2);
         float spacePerRow = height / (verticalVertexNumber * 2);
         int cols = horizontalVertexNumber * 2 + 1;
         int rows = verticalVertexNumber * 2 + 1;
+
+        int[] returnedCells = new int[cols * rows];
 
         int colStart = horizontalVertexNumber * -1;
         int rowStart = verticalVertexNumber * -1;
@@ -203,13 +213,15 @@ public class SymCube : Symbiote
 
                 // Create bone for vertex.
                 string name = symBone.CountBones().ToString();
-                GenerateSideCell(position, name);
+                returnedCells[currentVertexIndex] = GenerateSideCell(position, name);
 
                 verticalPos += spacePerRow;
                 currentVertexIndex++;
             }
             horizontalPos += spacePerCol;
         }
+
+        return returnedCells;
     }
 
     private void GenerateCrossQuadCells(

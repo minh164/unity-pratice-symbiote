@@ -156,6 +156,23 @@ public class SymDebug
         }
     }
 
+    public void DebugCellLayers(Dictionary<int, int[]> cellLayers)
+    {
+        foreach (var layer in cellLayers) {
+            Debug.Log("Layer " + layer.Key);
+            foreach (var cell in layer.Value) {
+                Debug.Log(cell);
+            }
+        }
+    }
+
+    public void DebugArray(int[] array)
+    {
+        for (int i = 0; i < array.Length; i++) {
+            Debug.Log(array[i]);
+        }
+    }
+
     public void DrawBoneConnections(GameObject[] bones)
     {
         foreach (GameObject bone in bones) {

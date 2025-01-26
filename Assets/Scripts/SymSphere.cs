@@ -25,8 +25,8 @@ public class SymSphere : SymCube
         GenerateSide("front", true);
         GenerateSide("right", true);
         GenerateSide("top", true);
-        GenerateCross();
-        GenerateCross(true);
+        // GenerateCross();
+        // GenerateCross(true);
 
         // Add collider for all bones.
         AddColliderForBones(colliderSize);

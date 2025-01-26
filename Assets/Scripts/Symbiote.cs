@@ -35,7 +35,10 @@ public class Symbiote : MonoBehaviour
     public float y {get { return 1;}}
     public float z {get { return 1;}}
 
-    protected Dictionary<int, int> cells = new Dictionary<int, int>{}; // Each cell includes index is vertex index and value is bone index.
+    // Each cell includes: key is vertex index and value is bone index.
+    protected Dictionary<int, int> cells = new Dictionary<int, int>{};
+    // Each layer includes: key is cell layer index and value is an array of vertex indexes.
+    protected Dictionary<int, int[]> cellLayers = new Dictionary<int, int[]>();
     protected SkinnedMeshRenderer rend;
     protected Mesh mesh;
     protected SymBone symBone;
@@ -158,6 +161,30 @@ public class Symbiote : MonoBehaviour
             BoxCollider collider = bone.GetComponent<BoxCollider>();
             collider.size = new Vector3(colliderSize, colliderSize, colliderSize);
             collider.transform.localScale = bone.transform.localScale;
+        }
+    }
+
+    protected void SetCellLayers(int[][] vertexData)
+    {
+        int layerTotal = vertexData.Length;
+        if (layerTotal % 2 == 0) {
+            Debug.Log("Vertex data must be an odd array");
+        }
+
+        int midNumber = (layerTotal - 1) / 2;
+        int cellLayerIndex = 0;
+
+        for (int i = midNumber; i >= midNumber; i--) {
+            int[] first = vertexData[midNumber - i];
+            int[] second = vertexData[midNumber + i];
+            int[] combined = first.Concat(second).ToArray();
+
+            if (cellLayers.ContainsKey(cellLayerIndex)) {
+                cellLayers[cellLayerIndex] = cellLayers[cellLayerIndex].Concat(combined).ToArray();
+            } else {
+                cellLayers.Add(cellLayerIndex,combined);
+            }
+            cellLayerIndex++;
         }
     }
 }
