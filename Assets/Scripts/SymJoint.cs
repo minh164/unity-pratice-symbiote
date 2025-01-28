@@ -18,6 +18,11 @@ public class SymJoint
         if (IsExistedJoint(bone, connectedBone) || IsExistedJoint(connectedBone, bone)) {
             return;
         }
+
+        if (GameObject.ReferenceEquals(bone, connectedBone)) {
+            // Debug.LogWarning("Bone " + bone.name + " can't connect to itself");
+            return;
+        }
         
         bone.AddComponent<SpringJoint>();
         SpringJoint[] joints = bone.GetComponents<SpringJoint>();

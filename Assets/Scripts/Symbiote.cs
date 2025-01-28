@@ -30,6 +30,10 @@ public class Symbiote : MonoBehaviour
     protected float damper = 2;
     [SerializeField]
     protected bool isUpdateWhenOffscreen = false;
+    [SerializeField]
+    public bool isRelativePosition = false;
+    [SerializeField]
+    public float relativePositionValue = 0.05f;
     
     public float x {get { return 1;}}
     public float y {get { return 1;}}
@@ -104,7 +108,7 @@ public class Symbiote : MonoBehaviour
     {
     }
 
-    protected int GenerateCell(Vector3 position, string name)
+    protected int CreateCell(Vector3 position, string name)
     {
         Vector3 vertex = symVertex.CreateVertex(position);
 
@@ -126,14 +130,14 @@ public class Symbiote : MonoBehaviour
         return vertexIndex;
     }
 
-    protected virtual int GenerateSideCell(Vector3 position, string name)
+    protected virtual int CreateSideCell(Vector3 position, string name, string side = null, bool isOutside = false)
     {
-        return GenerateCell(position, name);
+        return CreateCell(position, name);
     }
 
-    protected virtual int GenerateCrossCell(Vector3 position, string name)
+    protected virtual int CreateCrossCell(Vector3 position, string name)
     {
-        return GenerateCell(position, name);
+        return CreateCell(position, name);
     }
 
     protected void UpdateCellPositions()

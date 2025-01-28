@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class SymCube : Symbiote
 {
@@ -21,7 +22,7 @@ public class SymCube : Symbiote
     protected override void Create()
     {
         // Add Center Cell.
-        GenerateCell(Vector3.zero, "0");
+        CreateCell(Vector3.zero, "0");
 
         GenerateSide("front");
         GenerateSide("right");
@@ -35,6 +36,10 @@ public class SymCube : Symbiote
 
     protected void GenerateSide(string side, bool onlyOutsideQuads = false)
     {
+        if (! (new string[] {"front", "right", "top"}).Contains(side)) {
+            Debug.LogError("Invalid side: " + side);
+        }
+
         float forward = 0, width = 0, height = 0;
         int vertexNumber = 0;
         // Determine which first (-1) or last (1) quad will be counter cloclwise.
@@ -79,12 +84,22 @@ public class SymCube : Symbiote
                 continue;
             }
 
-            quadList[quadIndex] = GenerateQuadCells(width, height, forwardPos, side);
-            CreateQuadTriangles(
+            // Define inside or outside quad.
+            bool isOutside = false;
+            if (i == forwardStart || i == vertexNumber) {
+                isOutside = true;
+            }
+
+            quadList[quadIndex] = CreateQuadCells(width, height, forwardPos, side, isOutside);
+            int[] connections = CreateQuadConnections(
                 horizontalVertexNumber * 2 + 1,
-                verticalVertexNumber * 2 + 1,
-                counterClockwiseQuad < 0 ? i == forwardStart : i == vertexNumber
+                verticalVertexNumber * 2 + 1
             );
+
+            if (isOutside) {
+                AddQuadTriangles(connections, counterClockwiseQuad < 0 ? i == forwardStart : i == vertexNumber);
+            }
+            
             forwardPos += spacePerForward;
             quadIndex++;
         }
@@ -155,7 +170,7 @@ public class SymCube : Symbiote
             // This vertex is start point to generate cross quad.
             Vector3 vertexStartPosition = new Vector3(horizontalPos, (y / 2) * -1, verticalPos);
 
-            GenerateCrossQuadCells(
+            CreateCrossQuadCells(
                 vertexStartPosition,
                 x / (horizontalVertexNumber * 2),
                 y / (verticalVertexNumber * 2),
@@ -164,15 +179,14 @@ public class SymCube : Symbiote
                 verticalVertexNumber * 2 + 1,
                 rightSide
             );
-            CreateQuadTriangles(
-                crossVertexTotal,
-                verticalVertexNumber * 2 + 1,
+            AddQuadTriangles(
+                CreateQuadConnections(crossVertexTotal, verticalVertexNumber * 2 + 1),
                 rightSide
             );
         }
     }
 
-    private int[] GenerateQuadCells(float width, float height, float forwardPos, string side)
+    private int[] CreateQuadCells(float width, float height, float forwardPos, string side, bool isOutside = false)
     {
         float spacePerCol = width / (horizontalVertexNumber * 2);
         float spacePerRow = height / (verticalVertexNumber * 2);
@@ -196,24 +210,11 @@ public class SymCube : Symbiote
                     break;
                 }
 
-                switch (side) {
-                    case "front":
-                    case "back":
-                        position = new Vector3(horizontalPos, verticalPos, forwardPos);
-                        break;
-                    case "right":
-                    case "left":
-                        position = new Vector3(forwardPos, verticalPos, horizontalPos);
-                        break;
-                    case "top":
-                    case "bot":
-                        position = new Vector3(horizontalPos, forwardPos, verticalPos);
-                        break;
-                };
+                position = CreatePositionBySide(side, horizontalPos, verticalPos, forwardPos);
 
                 // Create bone for vertex.
-                string name = symBone.CountBones().ToString();
-                returnedCells[currentVertexIndex] = GenerateSideCell(position, name);
+                string name = symBone.CountBones().ToString() + "-" + side;
+                returnedCells[currentVertexIndex] = CreateSideCell(position, name, side, isOutside);
 
                 verticalPos += spacePerRow;
                 currentVertexIndex++;
@@ -224,7 +225,7 @@ public class SymCube : Symbiote
         return returnedCells;
     }
 
-    private void GenerateCrossQuadCells(
+    private void CreateCrossQuadCells(
         Vector3 vertexStartPosition,
         float spacePerHorizontal,
         float spacePerVertical,
@@ -253,7 +254,7 @@ public class SymCube : Symbiote
 
                 // Create bone for vertex.
                 string name = symBone.CountBones().ToString();
-                GenerateCrossCell(position, name);
+                CreateCrossCell(position, name);
 
                 verticalPos += spacePerVertical;
                 currentVertexIndex++;
@@ -268,7 +269,7 @@ public class SymCube : Symbiote
         }
     }
 
-    protected void CreateQuadTriangles(int horizontalVertexTotal, int verticalVertexTotal, bool isCounterClockwise = false)
+    protected int[] CreateQuadConnections(int horizontalVertexTotal, int verticalVertexTotal)
     {
         int cols = horizontalVertexTotal;
         int rows = verticalVertexTotal;
@@ -326,6 +327,11 @@ public class SymCube : Symbiote
             }
         }
 
+        return triangles;
+    }
+
+    protected void AddQuadTriangles(int[] triangles, bool isCounterClockwise = false)
+    {
         if (isCounterClockwise) {
             Array.Reverse(triangles);
         }
@@ -355,5 +361,60 @@ public class SymCube : Symbiote
     public virtual float GetVolume()
     {
         return x * y * z;
+    }
+
+    protected Vector3 CreatePositionBySide(string side, float horizontal, float vertical, float forward)
+    {
+        Vector3 position = Vector3.zero;
+        switch (side) {
+            case "front":
+            case "back":
+                position = new Vector3(horizontal, vertical, forward);
+                break;
+            case "right":
+            case "left":
+                position = new Vector3(forward, vertical, horizontal);
+                break;
+            case "top":
+            case "bot":
+                position = new Vector3(horizontal, forward, vertical);
+                break;
+            default:
+                Debug.LogError("Invalid side: " + side);
+                break;
+        };
+
+        return position;
+    }
+
+    protected Dictionary<string, float> GetDimensionsBySide(Vector3 position, string side)
+    {
+        Dictionary<string, float> dimensions = new Dictionary<string, float>();
+        
+        switch (side) {
+            case "front":
+            case "back":
+                dimensions.Add("width", position.x);
+                dimensions.Add("height", position.y);
+                dimensions.Add("forward", position.z);
+                break;
+            case "right":
+            case "left":
+                dimensions.Add("width", position.z);
+                dimensions.Add("height", position.y);
+                dimensions.Add("forward", position.x);
+                break;
+            case "top":
+            case "bot":
+                dimensions.Add("width", position.x);
+                dimensions.Add("height", position.z);
+                dimensions.Add("forward", position.y);
+                break;
+            default:
+                Debug.LogError("Invalid side: " + side);
+                break;
+        };
+
+        return dimensions;
     }
 }

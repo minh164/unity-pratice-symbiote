@@ -73,14 +73,37 @@ public class SymBone
     /// <returns></returns>
     public int FindBoneIndexByPosition(Vector3 position)
     {
+        float[] xRange = new float[2];
+        float[] yRange = new float[2];
+        float[] zRange = new float[2];
+        if (_symbiote.isRelativePosition) {
+            float relativeValue = _symbiote.relativePositionValue;
+            xRange = new float[2] {position.x - relativeValue, position.x + relativeValue};
+            yRange = new float[2] {position.y - relativeValue, position.y + relativeValue};
+            zRange = new float[2] {position.z - relativeValue, position.z + relativeValue};
+        }
+
         int boneIndex = -1;
         for (int i = 0; i < _bones.Length; i++) {
             GameObject bone = GetBoneByIndex(i);
-            if (bone.transform.localPosition != position) {
-                continue;
-            }
+            Vector3 bonePosition = bone.transform.localPosition;
 
-            boneIndex = i;
+            if (_symbiote.isRelativePosition) {
+                if (
+                    bonePosition.x >= xRange[0] && bonePosition.x <= xRange[1]
+                    && bonePosition.y >= yRange[0] && bonePosition.y <= yRange[1]
+                    && bonePosition.z >= zRange[0] && bonePosition.z <= zRange[1]
+                ) {
+                    boneIndex = i;
+                    break;
+                }
+            } else {
+                // Find latest bone with same position (if there are).
+                if (bonePosition != position) {
+                    continue;
+                }
+                boneIndex = i;
+            }
         }
 
         return boneIndex;

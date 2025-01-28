@@ -45,6 +45,7 @@ public class SymVertex
     {
         int vertexIndex = -1;
         for (int i = 0; i < _mesh.vertices.Length; i++) {
+            // One position can be belonged to many vertices, this function will get latest vertex.
             if (_mesh.vertices[i] != position) {
                 continue;
             }
